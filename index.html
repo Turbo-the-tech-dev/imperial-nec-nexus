@@ -10,230 +10,821 @@
     body { font-family: system-ui, -apple-system, sans-serif; }
     .tab-active { border-bottom: 4px solid #dc2626; color: #dc2626; }
     .vader-red { color: #dc2626; }
-    .card-hover { transition: all 0.2s; }
-    .card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgb(220 38 38 / 0.3); }
+    .card-hover { transition: all 0.3s; }
+    .card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 25px -3px rgb(220 38 38 / 0.4); }
+    .fade-in { animation: fadeIn 0.4s ease-in; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulse-red { 0%,100% { box-shadow: 0 0 0 0 rgb(220 38 38 / 0.4); } 50% { box-shadow: 0 0 20px 4px rgb(220 38 38 / 0.2); } }
+    .pulse-glow { animation: pulse-red 2s infinite; }
+    .nec-search:focus { box-shadow: 0 0 0 2px #dc2626; }
+    #interview-input:focus { box-shadow: 0 0 0 2px #dc2626; }
+    .quiz-btn:hover { background: #3f3f46; transform: scale(1.01); }
+    .quiz-btn { transition: all 0.15s; }
+    .score-ring { background: conic-gradient(#dc2626 var(--pct), #27272a 0); }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #18181b; }
+    ::-webkit-scrollbar-thumb { background: #dc2626; border-radius: 3px; }
   </style>
+  <script>
+    tailwind.config = { theme: { extend: { colors: { imperial: '#dc2626' } } } }
+  </script>
 </head>
 <body class="bg-zinc-950 text-white min-h-screen">
   <div class="max-w-7xl mx-auto">
-    <nav class="bg-black border-b border-red-900 px-6 py-4 flex items-center justify-between sticky top-0 z-50">
+
+    <!-- NAVBAR -->
+    <nav class="bg-black border-b border-red-900 px-4 md:px-6 py-4 flex items-center justify-between sticky top-0 z-50">
       <div class="flex items-center gap-3">
         <span class="text-3xl">⚡</span>
         <div>
-          <h1 class="text-2xl font-bold tracking-widest vader-red">IMPERIAL NEC COMMAND NEXUS</h1>
-          <p class="text-xs text-zinc-500">Turbo-the-tech-dev • Feb 25 2026 • Powered by DEATHSTAR</p>
+          <h1 class="text-lg md:text-2xl font-bold tracking-widest vader-red">IMPERIAL NEC COMMAND NEXUS</h1>
+          <p class="text-xs text-zinc-500">Turbo-the-tech-dev &bull; Feb 25 2026 &bull; Powered by DEATHSTAR</p>
         </div>
       </div>
-      <div class="flex items-center gap-4 text-sm">
-        <div class="px-4 py-1 bg-zinc-900 rounded-full text-emerald-400 flex items-center gap-2">
-          <i class="fa-solid fa-shield-halved"></i> 92% NEC MASTERY
+      <div class="flex items-center gap-2 md:gap-4 text-sm">
+        <div id="mastery-badge" class="hidden md:flex px-4 py-1 bg-zinc-900 rounded-full text-emerald-400 items-center gap-2">
+          <i class="fa-solid fa-shield-halved"></i> <span id="mastery-pct">0</span>% NEC MASTERY
         </div>
-        <button onclick="window.location.reload()" class="px-5 py-2 bg-red-600 hover:bg-red-700 rounded font-medium flex items-center gap-2">
-          <i class="fa-solid fa-rotate"></i> RESET SESSION
+        <button onclick="window.location.reload()" class="px-3 md:px-5 py-2 bg-red-600 hover:bg-red-700 rounded font-medium flex items-center gap-2 text-xs md:text-sm">
+          <i class="fa-solid fa-rotate"></i> RESET
         </button>
       </div>
     </nav>
 
-    <div class="flex border-b border-zinc-800 bg-zinc-900 overflow-x-auto">
-      <button onclick="switchTab(0)" class="tab px-8 py-4 font-medium tab-active flex items-center gap-2" id="tab-0"><i class="fa-solid fa-gauge-high"></i> HUB</button>
-      <button onclick="switchTab(1)" class="tab px-8 py-4 font-medium flex items-center gap-2" id="tab-1"><i class="fa-solid fa-calculator"></i> CALCULATORS</button>
-      <button onclick="switchTab(2)" class="tab px-8 py-4 font-medium flex items-center gap-2" id="tab-2"><i class="fa-solid fa-question-circle"></i> QUIZZES</button>
-      <button onclick="switchTab(3)" class="tab px-8 py-4 font-medium flex items-center gap-2" id="tab-3"><i class="fa-solid fa-comments"></i> AI INTERVIEW</button>
-      <button onclick="switchTab(4)" class="tab px-8 py-4 font-medium flex items-center gap-2" id="tab-4"><i class="fa-solid fa-sparkles"></i> PROMPTS</button>
-      <button onclick="switchTab(5)" class="tab px-8 py-4 font-medium flex items-center gap-2" id="tab-5"><i class="fa-solid fa-list-check"></i> TASKS</button>
+    <!-- TABS -->
+    <div class="flex border-b border-zinc-800 bg-zinc-900 overflow-x-auto" role="tablist">
+      <button onclick="switchTab(0)" class="tab px-4 md:px-8 py-3 md:py-4 font-medium tab-active flex items-center gap-2 whitespace-nowrap text-sm" id="tab-0" role="tab">
+        <i class="fa-solid fa-gauge-high"></i> HUB
+      </button>
+      <button onclick="switchTab(1)" class="tab px-4 md:px-8 py-3 md:py-4 font-medium flex items-center gap-2 whitespace-nowrap text-sm" id="tab-1" role="tab">
+        <i class="fa-solid fa-calculator"></i> CALCULATORS
+      </button>
+      <button onclick="switchTab(2)" class="tab px-4 md:px-8 py-3 md:py-4 font-medium flex items-center gap-2 whitespace-nowrap text-sm" id="tab-2" role="tab">
+        <i class="fa-solid fa-bolt"></i> QUIZZES
+      </button>
+      <button onclick="switchTab(3)" class="tab px-4 md:px-8 py-3 md:py-4 font-medium flex items-center gap-2 whitespace-nowrap text-sm" id="tab-3" role="tab">
+        <i class="fa-solid fa-comments"></i> AI INTERVIEW
+      </button>
+      <button onclick="switchTab(4)" class="tab px-4 md:px-8 py-3 md:py-4 font-medium flex items-center gap-2 whitespace-nowrap text-sm" id="tab-4" role="tab">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> PROMPTS
+      </button>
+      <button onclick="switchTab(5)" class="tab px-4 md:px-8 py-3 md:py-4 font-medium flex items-center gap-2 whitespace-nowrap text-sm" id="tab-5" role="tab">
+        <i class="fa-solid fa-list-check"></i> TASKS
+      </button>
     </div>
 
-    <div class="p-6">
-      <!-- HUB -->
-      <div id="panel-0" class="tab-panel">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- CONTENT -->
+    <div class="p-4 md:p-6">
+
+      <!-- ========== HUB ========== -->
+      <div id="panel-0" class="tab-panel fade-in">
+        <!-- Stats Row -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div class="bg-zinc-900 p-6 rounded-2xl card-hover">
-            <h2 class="text-xl font-bold mb-4 vader-red">WEEKLY CONQUESTS</h2>
-            <div class="space-y-4">
-              <div class="flex justify-between"><span>Electrician Core</span><span class="text-emerald-400">49 strikes</span></div>
-              <div class="flex justify-between"><span>DEATHSTAR Orchestrator</span><span class="text-emerald-400">22 strikes</span></div>
-              <div class="flex justify-between"><span>AI Interview Simulator</span><span class="text-emerald-400">17 strikes</span></div>
+            <h2 class="text-xl font-bold mb-4 vader-red"><i class="fa-solid fa-trophy mr-2"></i>WEEKLY CONQUESTS</h2>
+            <div class="space-y-3">
+              <div class="flex justify-between items-center"><span>Electrician Core</span><span class="text-emerald-400 font-mono">49 commits</span></div>
+              <div class="flex justify-between items-center"><span>DEATHSTAR Orchestrator</span><span class="text-emerald-400 font-mono">22 commits</span></div>
+              <div class="flex justify-between items-center"><span>AI Interview Simulator</span><span class="text-emerald-400 font-mono">17 commits</span></div>
+              <div class="flex justify-between items-center"><span>Prompt Genie</span><span class="text-emerald-400 font-mono">12 commits</span></div>
+              <div class="flex justify-between items-center"><span>NEC Study Guide</span><span class="text-emerald-400 font-mono">8 commits</span></div>
             </div>
           </div>
-          <div class="bg-zinc-900 p-6 rounded-2xl card-hover">
-            <h2 class="text-xl font-bold mb-4 vader-red">IMPERIAL STATUS</h2>
+          <div class="bg-zinc-900 p-6 rounded-2xl card-hover text-center">
+            <h2 class="text-xl font-bold mb-4 vader-red"><i class="fa-solid fa-fire mr-2"></i>IMPERIAL STATUS</h2>
             <div class="text-6xl font-bold text-red-600">466</div>
-            <p class="text-zinc-400">Contributions this quarter</p>
-            <div class="mt-6 text-xs text-zinc-500">Pull Shark ×2 • 75 repos</div>
+            <p class="text-zinc-400 mt-2">Contributions this quarter</p>
+            <div class="mt-4 flex justify-center gap-3 text-xs text-zinc-500">
+              <span class="bg-zinc-800 px-3 py-1 rounded-full">Pull Shark x2</span>
+              <span class="bg-zinc-800 px-3 py-1 rounded-full">177 repos</span>
+            </div>
           </div>
-          <div class="bg-zinc-900 p-6 rounded-2xl card-hover flex flex-col justify-center items-center text-center">
+          <div class="bg-zinc-900 p-6 rounded-2xl card-hover pulse-glow flex flex-col justify-center items-center text-center">
             <i class="fa-solid fa-skull text-7xl text-red-600 mb-4"></i>
-            <p class="text-2xl font-bold">Ready for inspection</p>
+            <p class="text-2xl font-bold">READY FOR INSPECTION</p>
+            <p class="text-zinc-500 text-sm mt-2">All systems operational</p>
+          </div>
+        </div>
+
+        <!-- NEC Code Index Search -->
+        <div class="bg-zinc-900 p-6 rounded-2xl mb-6">
+          <h2 class="text-xl font-bold mb-4 vader-red"><i class="fa-solid fa-book mr-2"></i>NEC 2026 CODE INDEX</h2>
+          <input id="nec-search" type="text" placeholder="Search NEC articles... (e.g. grounding, 250, motors)"
+                 class="nec-search w-full bg-zinc-800 border border-zinc-700 rounded-xl p-4 mb-4 focus:outline-none text-lg"
+                 oninput="filterNEC()" aria-label="Search NEC articles">
+          <div id="nec-results" class="space-y-2 max-h-96 overflow-y-auto"></div>
+        </div>
+
+        <!-- Quick Reference -->
+        <div class="bg-zinc-900 p-6 rounded-2xl">
+          <h2 class="text-xl font-bold mb-4 vader-red"><i class="fa-solid fa-bolt mr-2"></i>QUICK REFERENCE VALUES</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
+            <div class="bg-zinc-800 p-3 rounded-xl flex justify-between"><span class="text-zinc-400">Working space depth</span><span class="font-mono text-emerald-400">3-5 ft</span></div>
+            <div class="bg-zinc-800 p-3 rounded-xl flex justify-between"><span class="text-zinc-400">Working space width</span><span class="font-mono text-emerald-400">30 in min</span></div>
+            <div class="bg-zinc-800 p-3 rounded-xl flex justify-between"><span class="text-zinc-400">Working space height</span><span class="font-mono text-emerald-400">6.5 ft min</span></div>
+            <div class="bg-zinc-800 p-3 rounded-xl flex justify-between"><span class="text-zinc-400">Receptacle spacing</span><span class="font-mono text-emerald-400">6 ft max</span></div>
+            <div class="bg-zinc-800 p-3 rounded-xl flex justify-between"><span class="text-zinc-400">Kitchen counter spacing</span><span class="font-mono text-emerald-400">24 in max</span></div>
+            <div class="bg-zinc-800 p-3 rounded-xl flex justify-between"><span class="text-zinc-400">Min dwelling service</span><span class="font-mono text-emerald-400">100A</span></div>
+            <div class="bg-zinc-800 p-3 rounded-xl flex justify-between"><span class="text-zinc-400">Continuous load factor</span><span class="font-mono text-emerald-400">125%</span></div>
+            <div class="bg-zinc-800 p-3 rounded-xl flex justify-between"><span class="text-zinc-400">General lighting load</span><span class="font-mono text-emerald-400">3 VA/sq ft</span></div>
+            <div class="bg-zinc-800 p-3 rounded-xl flex justify-between"><span class="text-zinc-400">Small appliance circuits</span><span class="font-mono text-emerald-400">2 min @ 1500 VA</span></div>
+            <div class="bg-zinc-800 p-3 rounded-xl flex justify-between"><span class="text-zinc-400">Max service disconnects</span><span class="font-mono text-emerald-400">6</span></div>
+            <div class="bg-zinc-800 p-3 rounded-xl flex justify-between"><span class="text-zinc-400">Max voltage drop (total)</span><span class="font-mono text-emerald-400">5%</span></div>
+            <div class="bg-zinc-800 p-3 rounded-xl flex justify-between"><span class="text-zinc-400">Max VD branch circuit</span><span class="font-mono text-emerald-400">3%</span></div>
           </div>
         </div>
       </div>
 
-      <!-- CALCULATORS -->
-      <div id="panel-1" class="tab-panel hidden">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- ========== CALCULATORS ========== -->
+      <div id="panel-1" class="tab-panel hidden fade-in">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+          <!-- Wire Size Calculator (NEC Table 310.16) -->
           <div class="bg-zinc-900 p-6 rounded-2xl">
-            <h3 class="font-bold text-lg mb-4">Wire Size (Copper 75°C)</h3>
-            <input id="amps" type="number" placeholder="Amps (e.g. 25)" class="w-full bg-zinc-800 border border-zinc-700 rounded p-3 mb-4">
+            <h3 class="font-bold text-lg mb-1"><i class="fa-solid fa-bolt mr-2 text-red-500"></i>Wire Size Calculator</h3>
+            <p class="text-xs text-zinc-500 mb-4">NEC Table 310.16 &mdash; Copper conductors</p>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <label class="text-xs text-zinc-400 mb-1 block">Load (Amps)</label>
+                <input id="wire-amps" type="number" placeholder="e.g. 45" class="w-full bg-zinc-800 border border-zinc-700 rounded p-3">
+              </div>
+              <div>
+                <label class="text-xs text-zinc-400 mb-1 block">Temperature Rating</label>
+                <select id="wire-temp" class="w-full bg-zinc-800 border border-zinc-700 rounded p-3">
+                  <option value="60">60&deg;C (TW, UF)</option>
+                  <option value="75" selected>75&deg;C (THW, THWN)</option>
+                  <option value="90">90&deg;C (THHN, XHHW)</option>
+                </select>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <label class="text-xs text-zinc-400 mb-1 block">Material</label>
+                <select id="wire-material" class="w-full bg-zinc-800 border border-zinc-700 rounded p-3">
+                  <option value="cu">Copper</option>
+                  <option value="al">Aluminum</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-xs text-zinc-400 mb-1 block">Continuous?</label>
+                <select id="wire-cont" class="w-full bg-zinc-800 border border-zinc-700 rounded p-3">
+                  <option value="no">No</option>
+                  <option value="yes">Yes (125%)</option>
+                </select>
+              </div>
+            </div>
             <button onclick="calcWire()" class="w-full bg-red-600 hover:bg-red-700 py-3 rounded font-medium">CALCULATE AWG</button>
-            <div id="wire-result" class="mt-6 text-4xl font-mono text-center text-emerald-400"></div>
+            <div id="wire-result" class="mt-6 text-center"></div>
           </div>
+
+          <!-- Voltage Drop Calculator -->
           <div class="bg-zinc-900 p-6 rounded-2xl">
-            <h3 class="font-bold text-lg mb-4">Voltage Drop (Single Phase)</h3>
-            <div class="grid grid-cols-2 gap-4">
-              <input id="vd-amps" type="number" placeholder="Amps" class="bg-zinc-800 border border-zinc-700 rounded p-3">
-              <input id="vd-feet" type="number" placeholder="Feet" class="bg-zinc-800 border border-zinc-700 rounded p-3">
+            <h3 class="font-bold text-lg mb-1"><i class="fa-solid fa-arrow-trend-down mr-2 text-red-500"></i>Voltage Drop Calculator</h3>
+            <p class="text-xs text-zinc-500 mb-4">Vd = (2 &times; K &times; I &times; D) / CMA</p>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <label class="text-xs text-zinc-400 mb-1 block">Current (Amps)</label>
+                <input id="vd-amps" type="number" placeholder="e.g. 20" class="w-full bg-zinc-800 border border-zinc-700 rounded p-3">
+              </div>
+              <div>
+                <label class="text-xs text-zinc-400 mb-1 block">Distance (ft, one-way)</label>
+                <input id="vd-feet" type="number" placeholder="e.g. 150" class="w-full bg-zinc-800 border border-zinc-700 rounded p-3">
+              </div>
             </div>
-            <button onclick="calcVD()" class="mt-4 w-full bg-red-600 hover:bg-red-700 py-3 rounded font-medium">CALCULATE % DROP</button>
-            <div id="vd-result" class="mt-6 text-4xl font-mono text-center text-emerald-400"></div>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <label class="text-xs text-zinc-400 mb-1 block">Wire Size</label>
+                <select id="vd-wire" class="w-full bg-zinc-800 border border-zinc-700 rounded p-3">
+                  <option value="4110">14 AWG</option>
+                  <option value="6530">12 AWG</option>
+                  <option value="10380" selected>10 AWG</option>
+                  <option value="16510">8 AWG</option>
+                  <option value="26240">6 AWG</option>
+                  <option value="41740">4 AWG</option>
+                  <option value="66360">2 AWG</option>
+                  <option value="105600">1/0 AWG</option>
+                  <option value="133100">2/0 AWG</option>
+                  <option value="167800">3/0 AWG</option>
+                  <option value="211600">4/0 AWG</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-xs text-zinc-400 mb-1 block">Source Voltage</label>
+                <select id="vd-voltage" class="w-full bg-zinc-800 border border-zinc-700 rounded p-3">
+                  <option value="120">120V</option>
+                  <option value="208">208V</option>
+                  <option value="240">240V</option>
+                  <option value="277">277V</option>
+                  <option value="480">480V</option>
+                </select>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <label class="text-xs text-zinc-400 mb-1 block">Phase</label>
+                <select id="vd-phase" class="w-full bg-zinc-800 border border-zinc-700 rounded p-3">
+                  <option value="1">Single Phase</option>
+                  <option value="3">Three Phase</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-xs text-zinc-400 mb-1 block">Conductor</label>
+                <select id="vd-mat" class="w-full bg-zinc-800 border border-zinc-700 rounded p-3">
+                  <option value="12.9">Copper (K=12.9)</option>
+                  <option value="21.2">Aluminum (K=21.2)</option>
+                </select>
+              </div>
+            </div>
+            <button onclick="calcVD()" class="w-full bg-red-600 hover:bg-red-700 py-3 rounded font-medium">CALCULATE VOLTAGE DROP</button>
+            <div id="vd-result" class="mt-6 text-center"></div>
           </div>
+
+          <!-- Ohm's Law Power Wheel -->
           <div class="bg-zinc-900 p-6 rounded-2xl">
-            <h3 class="font-bold text-lg mb-4">Ohm's Law Solver</h3>
-            <select id="ohm-mode" class="w-full bg-zinc-800 border border-zinc-700 rounded p-3 mb-4">
-              <option value="v">Find Voltage (V = I × R)</option>
-              <option value="i">Find Current (I = V ÷ R)</option>
-              <option value="r">Find Resistance (R = V ÷ I)</option>
-            </select>
-            <div class="grid grid-cols-2 gap-4">
-              <input id="ohm1" placeholder="Value 1" class="bg-zinc-800 border border-zinc-700 rounded p-3">
-              <input id="ohm2" placeholder="Value 2" class="bg-zinc-800 border border-zinc-700 rounded p-3">
+            <h3 class="font-bold text-lg mb-1"><i class="fa-solid fa-circle-nodes mr-2 text-red-500"></i>Ohm's Law Power Wheel</h3>
+            <p class="text-xs text-zinc-500 mb-4">Enter any 2 values &mdash; solves all 4</p>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <label class="text-xs text-zinc-400 mb-1 block">Voltage (V)</label>
+                <input id="ohm-v" type="number" placeholder="Volts" class="w-full bg-zinc-800 border border-zinc-700 rounded p-3">
+              </div>
+              <div>
+                <label class="text-xs text-zinc-400 mb-1 block">Current (I)</label>
+                <input id="ohm-i" type="number" placeholder="Amps" class="w-full bg-zinc-800 border border-zinc-700 rounded p-3">
+              </div>
+              <div>
+                <label class="text-xs text-zinc-400 mb-1 block">Resistance (R)</label>
+                <input id="ohm-r" type="number" placeholder="Ohms" class="w-full bg-zinc-800 border border-zinc-700 rounded p-3">
+              </div>
+              <div>
+                <label class="text-xs text-zinc-400 mb-1 block">Power (P)</label>
+                <input id="ohm-p" type="number" placeholder="Watts" class="w-full bg-zinc-800 border border-zinc-700 rounded p-3">
+              </div>
             </div>
-            <button onclick="calcOhm()" class="mt-4 w-full bg-red-600 hover:bg-red-700 py-3 rounded font-medium">SOLVE</button>
-            <div id="ohm-result" class="mt-6 text-4xl font-mono text-center text-emerald-400"></div>
+            <button onclick="calcOhm()" class="w-full bg-red-600 hover:bg-red-700 py-3 rounded font-medium">SOLVE</button>
+            <div id="ohm-result" class="mt-6 text-center"></div>
+          </div>
+
+          <!-- NEC 220 Residential Load Calculator -->
+          <div class="bg-zinc-900 p-6 rounded-2xl">
+            <h3 class="font-bold text-lg mb-1"><i class="fa-solid fa-house-signal mr-2 text-red-500"></i>NEC 220 Dwelling Load Calc</h3>
+            <p class="text-xs text-zinc-500 mb-4">Article 220 Standard Method</p>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <label class="text-xs text-zinc-400 mb-1 block">Square Footage</label>
+                <input id="load-sqft" type="number" placeholder="e.g. 2400" class="w-full bg-zinc-800 border border-zinc-700 rounded p-3">
+              </div>
+              <div>
+                <label class="text-xs text-zinc-400 mb-1 block">Small Appliance Circuits</label>
+                <input id="load-sa" type="number" value="2" class="w-full bg-zinc-800 border border-zinc-700 rounded p-3">
+              </div>
+              <div>
+                <label class="text-xs text-zinc-400 mb-1 block">Laundry Circuit?</label>
+                <select id="load-laundry" class="w-full bg-zinc-800 border border-zinc-700 rounded p-3">
+                  <option value="yes">Yes (1500 VA)</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-xs text-zinc-400 mb-1 block">Fixed Appliances (VA)</label>
+                <input id="load-fixed" type="number" placeholder="e.g. 9000" class="w-full bg-zinc-800 border border-zinc-700 rounded p-3">
+              </div>
+            </div>
+            <button onclick="calcLoad()" class="w-full bg-red-600 hover:bg-red-700 py-3 rounded font-medium">CALCULATE SERVICE LOAD</button>
+            <div id="load-result" class="mt-6 text-center"></div>
           </div>
         </div>
       </div>
 
-      <!-- QUIZZES -->
-      <div id="panel-2" class="tab-panel hidden">
-        <div class="max-w-2xl mx-auto bg-zinc-900 p-8 rounded-3xl">
-          <h3 class="text-2xl font-bold mb-6 text-center vader-red">NEC KNOWLEDGE TEST</h3>
-          <div id="quiz-question" class="text-xl mb-8"></div>
-          <div id="quiz-options" class="space-y-3"></div>
-          <div id="quiz-feedback" class="mt-8 text-center font-medium"></div>
-        </div>
-      </div>
-
-      <!-- AI INTERVIEW -->
-      <div id="panel-3" class="tab-panel hidden">
-        <div class="max-w-2xl mx-auto bg-zinc-900 rounded-3xl overflow-hidden">
-          <div id="interview-chat" class="h-96 overflow-y-auto p-6 space-y-6"></div>
-          <div class="p-4 border-t border-zinc-800 flex gap-3">
-            <input id="interview-input" placeholder="Your answer, Trooper..." class="flex-1 bg-zinc-800 border border-zinc-700 rounded-full px-6 py-3 focus:outline-none focus:border-red-600">
-            <button onclick="sendInterview()" class="bg-red-600 hover:bg-red-700 px-8 rounded-full font-medium">SEND</button>
+      <!-- ========== QUIZZES ========== -->
+      <div id="panel-2" class="tab-panel hidden fade-in">
+        <div class="max-w-2xl mx-auto">
+          <!-- Score Header -->
+          <div class="flex justify-between items-center mb-6">
+            <div>
+              <h3 class="text-2xl font-bold vader-red">NEC KNOWLEDGE TEST</h3>
+              <p class="text-sm text-zinc-500">SRS-powered &bull; <span id="quiz-count">25</span> questions</p>
+            </div>
+            <div class="text-right">
+              <div class="text-3xl font-bold text-emerald-400"><span id="quiz-score">0</span>/<span id="quiz-total">0</span></div>
+              <p class="text-xs text-zinc-500">correct</p>
+            </div>
+          </div>
+          <!-- Difficulty Selector -->
+          <div class="flex gap-2 mb-6">
+            <button onclick="setDifficulty('all')" class="diff-btn px-4 py-2 rounded-full text-sm bg-red-600" data-diff="all">All Levels</button>
+            <button onclick="setDifficulty('apprentice')" class="diff-btn px-4 py-2 rounded-full text-sm bg-zinc-800" data-diff="apprentice">Apprentice</button>
+            <button onclick="setDifficulty('journeyman')" class="diff-btn px-4 py-2 rounded-full text-sm bg-zinc-800" data-diff="journeyman">Journeyman</button>
+            <button onclick="setDifficulty('master')" class="diff-btn px-4 py-2 rounded-full text-sm bg-zinc-800" data-diff="master">Master</button>
+          </div>
+          <!-- Question Card -->
+          <div class="bg-zinc-900 p-8 rounded-3xl">
+            <div class="flex items-center gap-2 mb-4">
+              <span id="quiz-difficulty-badge" class="px-3 py-1 rounded-full text-xs bg-zinc-700"></span>
+              <span id="quiz-category-badge" class="px-3 py-1 rounded-full text-xs bg-zinc-700"></span>
+              <span id="quiz-nec-ref" class="px-3 py-1 rounded-full text-xs bg-red-900/50 vader-red"></span>
+            </div>
+            <div id="quiz-question" class="text-xl mb-8 leading-relaxed"></div>
+            <div id="quiz-options" class="space-y-3"></div>
+            <div id="quiz-feedback" class="mt-6 p-4 rounded-2xl hidden"></div>
+            <div id="quiz-explanation" class="mt-4 text-sm text-zinc-400 hidden"></div>
           </div>
         </div>
       </div>
 
-      <!-- PROMPTS -->
-      <div id="panel-4" class="tab-panel hidden">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div onclick="copyPrompt(this)" class="bg-zinc-900 p-6 rounded-2xl cursor-pointer card-hover">
-            <p class="font-mono text-sm text-zinc-400">Prompt #1 — Wire Size</p>
-            <p class="mt-3">"You are a Master Electrician. Validate this branch circuit: 240V, 45A continuous load, 150ft run, copper. Give AWG, conduit, and NEC articles."</p>
+      <!-- ========== AI INTERVIEW ========== -->
+      <div id="panel-3" class="tab-panel hidden fade-in">
+        <div class="max-w-2xl mx-auto">
+          <div class="flex justify-between items-center mb-4">
+            <div>
+              <h3 class="text-xl font-bold vader-red">AI MOCK INTERVIEW</h3>
+              <p class="text-xs text-zinc-500">Gemini-powered NEC interview simulator</p>
+            </div>
+            <div class="flex gap-2">
+              <select id="interview-level" class="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1 text-sm" onchange="resetInterview()">
+                <option value="apprentice">Apprentice</option>
+                <option value="journeyman" selected>Journeyman</option>
+                <option value="master">Master</option>
+              </select>
+            </div>
           </div>
-          <div onclick="copyPrompt(this)" class="bg-zinc-900 p-6 rounded-2xl cursor-pointer card-hover">
-            <p class="font-mono text-sm text-zinc-400">Prompt #2 — Grounding</p>
-            <p class="mt-3">"Explain NEC 250.122 for equipment grounding conductor sizing on a 200A feeder. Include table reference."</p>
+          <div class="bg-zinc-900 rounded-3xl overflow-hidden">
+            <div id="interview-chat" class="h-[28rem] overflow-y-auto p-6 space-y-4"></div>
+            <div class="p-4 border-t border-zinc-800 flex gap-3">
+              <input id="interview-input" placeholder="Your answer, Trooper..."
+                     class="flex-1 bg-zinc-800 border border-zinc-700 rounded-full px-6 py-3 focus:outline-none"
+                     onkeydown="if(event.key==='Enter')sendInterview()" aria-label="Interview answer input">
+              <button onclick="sendInterview()" class="bg-red-600 hover:bg-red-700 px-6 md:px-8 rounded-full font-medium">SEND</button>
+            </div>
+          </div>
+          <div class="mt-4 flex justify-between text-sm text-zinc-500">
+            <span>Question <span id="iv-qnum">0</span>/<span id="iv-qtotal">10</span></span>
+            <span>Score: <span id="iv-score" class="text-emerald-400">0</span> pts</span>
           </div>
         </div>
       </div>
 
-      <!-- TASKS -->
-      <div id="panel-5" class="tab-panel hidden">
-        <div class="max-w-md mx-auto bg-zinc-900 p-6 rounded-3xl">
-          <div class="flex gap-3 mb-6">
-            <input id="todo-input" placeholder="New imperial task..." class="flex-1 bg-zinc-800 border border-zinc-700 rounded-full px-6 py-3">
-            <button onclick="addTask()" class="bg-red-600 hover:bg-red-700 px-8 rounded-full">ADD</button>
+      <!-- ========== PROMPTS ========== -->
+      <div id="panel-4" class="tab-panel hidden fade-in">
+        <div class="mb-6">
+          <h3 class="text-xl font-bold vader-red mb-2"><i class="fa-solid fa-wand-magic-sparkles mr-2"></i>PROMPT MARKETPLACE</h3>
+          <p class="text-sm text-zinc-500">Click any prompt to copy. From Electrician-PROMPT-GENIE &amp; prompt-marketplace.</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="prompts-grid"></div>
+      </div>
+
+      <!-- ========== TASKS ========== -->
+      <div id="panel-5" class="tab-panel hidden fade-in">
+        <div class="max-w-lg mx-auto">
+          <h3 class="text-xl font-bold vader-red mb-4"><i class="fa-solid fa-list-check mr-2"></i>IMPERIAL TASK TRACKER</h3>
+          <div class="bg-zinc-900 p-6 rounded-3xl">
+            <div class="flex gap-3 mb-6">
+              <input id="todo-input" placeholder="New imperial task..."
+                     class="flex-1 bg-zinc-800 border border-zinc-700 rounded-full px-6 py-3 focus:outline-none focus:border-red-600"
+                     onkeydown="if(event.key==='Enter')addTask()" aria-label="New task input">
+              <button onclick="addTask()" class="bg-red-600 hover:bg-red-700 px-8 rounded-full font-medium">ADD</button>
+            </div>
+            <ul id="todo-list" class="space-y-3"></ul>
+            <div id="todo-stats" class="mt-4 text-center text-xs text-zinc-500"></div>
           </div>
-          <ul id="todo-list" class="space-y-3"></ul>
         </div>
       </div>
+
     </div>
   </div>
 
-  <footer class="text-center py-6 text-xs text-zinc-500 border-t border-zinc-900">
-    IMPERIAL NEC COMMAND NEXUS v1.0 • FOR DEMO PURPOSES ONLY • CONQUER THE CODE
+  <footer class="text-center py-6 text-xs text-zinc-600 border-t border-zinc-900">
+    <p>IMPERIAL NEC COMMAND NEXUS v2.0 &bull; Built by <a href="https://github.com/Turbo-the-tech-dev" class="vader-red hover:underline" target="_blank" rel="noopener">Turbo-the-tech-dev</a> &bull; Powered by DEATHSTAR</p>
+    <p class="mt-1">177 repos &bull; 466 contributions &bull; The Empire endures.</p>
   </footer>
 
   <script>
+    // ===========================
+    // TAB SYSTEM
+    // ===========================
     function switchTab(n) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('tab-active'));
       document.getElementById('tab-'+n).classList.add('tab-active');
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
-      document.getElementById('panel-'+n).classList.remove('hidden');
+      const panel = document.getElementById('panel-'+n);
+      panel.classList.remove('hidden');
+      // Lazy-init interview chat on first visit
+      if (n === 3 && document.getElementById('interview-chat').children.length === 0) {
+        resetInterview();
+      }
     }
 
-    function calcWire() {
-      const amps = parseFloat(document.getElementById('amps').value);
-      let awg = '—';
-      if (amps <= 15) awg = '14 AWG';
-      else if (amps <= 20) awg = '12 AWG';
-      else if (amps <= 30) awg = '10 AWG';
-      else if (amps <= 50) awg = '8 AWG';
-      else if (amps <= 65) awg = '6 AWG';
-      else awg = '4 AWG+';
-      document.getElementById('wire-result').innerHTML = `<span class="text-5xl">${awg}</span><br><span class="text-sm text-zinc-400">NEC Table 310.16</span>`;
+    // ===========================
+    // NEC 2026 CODE INDEX (Real data from nec-2026-study-guide)
+    // ===========================
+    const necArticles = [
+      {art:"100", title:"Definitions", ch:1, desc:"Key terms: Accessible, Ampacity, Branch Circuit, Service, Dwelling Unit. Foundation for all NEC interpretation."},
+      {art:"110", title:"General Requirements", ch:1, desc:"Working space: 3ft depth, 30in width, 6.5ft height min. Equipment installation, entrance requirements, circuit impedance."},
+      {art:"200", title:"Use & ID of Grounded Conductors", ch:2, desc:"Identification rules for grounded (neutral) conductors. White or gray insulation requirements."},
+      {art:"210", title:"Branch Circuits", ch:2, desc:"Min 2 circuits for kitchen/dining. Receptacle spacing max 6ft along walls. GFCI/AFCI requirements. 210.19(A) conductor sizing."},
+      {art:"215", title:"Feeders", ch:2, desc:"Conductor ampacity = 125% continuous + 100% noncontinuous load. Feeder tap rules. Overcurrent protection."},
+      {art:"220", title:"Branch-Circuit, Feeder & Service Load Calculations", ch:2, desc:"General lighting 3 VA/sq ft. Min 2 small-appliance circuits at 1500 VA each. Standard & optional calculation methods."},
+      {art:"225", title:"Outside Branch Circuits & Feeders", ch:2, desc:"Requirements for circuits run on or between buildings or structures."},
+      {art:"230", title:"Services", ch:2, desc:"Min 100A disconnect for dwellings. Max 6 disconnects per 230.71. Surge protection required on dwelling services (2020+)."},
+      {art:"240", title:"Overcurrent Protection", ch:2, desc:"Standard ratings: 15A-6000A. Devices at readily accessible locations at supply point. Fuses and circuit breakers."},
+      {art:"250", title:"Grounding & Bonding", ch:2, desc:"System grounding, grounding electrodes, GEC sizing (Table 250.66), EGC sizing (Table 250.122). Most-tested article on exams."},
+      {art:"300", title:"General Requirements for Wiring Methods", ch:3, desc:"Conductor installation, securing & supporting, protection against physical damage, underground installations."},
+      {art:"310", title:"Conductors for General Wiring", ch:3, desc:"Table 310.16: Allowable ampacities. Conductor properties, insulation types, temperature ratings, derating factors."},
+      {art:"312", title:"Cabinets, Cutout Boxes & Meter Socket Enclosures", ch:3, desc:"Installation requirements, wire bending space, conductor fill."},
+      {art:"314", title:"Outlet, Device, Pull & Junction Boxes", ch:3, desc:"Box fill calculations per Table 314.16(A). Volume allowances per conductor size."},
+      {art:"320", title:"Armored Cable (Type AC)", ch:3, desc:"Uses permitted/not permitted. Installation requirements for AC cable."},
+      {art:"334", title:"Nonmetallic-Sheathed Cable (NM, NM-B)", ch:3, desc:"Romex. Uses in dwellings, securing requirements, protection, not in commercial above 3 floors."},
+      {art:"338", title:"Service-Entrance Cable (SE, USE)", ch:3, desc:"Types SE and USE. Installation for service entrances and feeders."},
+      {art:"342", title:"Intermediate Metal Conduit (IMC)", ch:3, desc:"Uses, installation, supports, number of conductors. Lighter than RMC."},
+      {art:"344", title:"Rigid Metal Conduit (RMC)", ch:3, desc:"Heaviest conduit type. Uses, installation, couplings, bushings."},
+      {art:"348", title:"Flexible Metal Conduit (FMC)", ch:3, desc:"Greenfield. Uses, supports, grounding requirements."},
+      {art:"350", title:"Liquidtight Flexible Metal Conduit (LFMC)", ch:3, desc:"Wet locations, outdoor use. Size limitations, grounding."},
+      {art:"352", title:"Rigid PVC Conduit (PVC)", ch:3, desc:"Non-metallic conduit. Expansion fittings, support spacing, not in hazardous locations."},
+      {art:"358", title:"Electrical Metallic Tubing (EMT)", ch:3, desc:"Thinwall conduit. Most common commercial conduit. Compression and set-screw fittings."},
+      {art:"404", title:"Switches", ch:4, desc:"General-use snap switches, dimmers, switch ratings. Grounding requirements."},
+      {art:"406", title:"Receptacles, Cord Connectors & Attachment Plugs", ch:4, desc:"Receptacle ratings, tamper-resistant requirements, GFCI and weather-resistant."},
+      {art:"408", title:"Switchboards, Switchgear & Panelboards", ch:4, desc:"Installation, clearances, overcurrent protection, panelboard ratings."},
+      {art:"410", title:"Luminaires, Lampholders & Lamps", ch:4, desc:"Lighting fixture installation, closet clearances, recessed fixtures, wet locations."},
+      {art:"422", title:"Appliances", ch:4, desc:"Branch circuit sizing, disconnecting means, overcurrent protection for appliances."},
+      {art:"424", title:"Fixed Electric Space-Heating Equipment", ch:4, desc:"Baseboard heaters, duct heaters, heating cables. Branch circuit sizing."},
+      {art:"430", title:"Motors, Motor Circuits & Controllers", ch:4, desc:"Motor FLC tables, branch circuit sizing (125% FLC), overload protection, disconnecting means. Critical exam article."},
+      {art:"440", title:"Air-Conditioning & Refrigerating Equipment", ch:4, desc:"Compressor motors, branch circuit sizing, disconnects, nameplate requirements."},
+      {art:"450", title:"Transformers", ch:4, desc:"Overcurrent protection (primary/secondary), vault requirements, grounding."},
+      {art:"480", title:"Batteries & Battery Systems", ch:4, desc:"Storage batteries, disconnects, overcurrent protection, ventilation."},
+      {art:"500", title:"Hazardous (Classified) Locations", ch:5, desc:"Class I (flammable gases), Class II (combustible dust), Class III (fibers). Division 1 & 2 classification."},
+      {art:"501", title:"Class I Locations", ch:5, desc:"Wiring methods, sealing, equipment requirements for flammable gas/vapor environments."},
+      {art:"505", title:"Zone 0, 1, and 2 Locations", ch:5, desc:"IEC zone classification system for Class I hazardous locations."},
+      {art:"511", title:"Commercial Garages", ch:5, desc:"Repair and storage. Classification of areas, wiring methods, GFCI requirements."},
+      {art:"517", title:"Healthcare Facilities", ch:5, desc:"Essential electrical systems, patient care areas, isolated power, ground fault protection."},
+      {art:"518", title:"Places of Assembly", ch:5, desc:"Theaters, restaurants, churches. Wiring methods, emergency systems."},
+      {art:"520", title:"Theaters & Similar Locations", ch:5, desc:"Stage equipment, portable switchboards, dressing rooms, stage lighting."},
+      {art:"525", title:"Carnivals, Circuses & Fairs", ch:5, desc:"Temporary installations, GFCI protection, grounding requirements."},
+      {art:"547", title:"Agricultural Buildings", ch:5, desc:"Equipotential planes, wiring methods for corrosive environments, GFCI."},
+      {art:"550", title:"Mobile Homes & Manufactured Housing", ch:5, desc:"Service equipment, feeders, branch circuits, grounding for mobile homes."},
+      {art:"555", title:"Marinas, Boatyards & Floating Buildings", ch:5, desc:"Shore power, ground fault protection, wiring methods near water."},
+      {art:"590", title:"Temporary Installations", ch:5, desc:"Construction sites, holiday decorations. GFCI required, 90-day time limit."},
+      {art:"600", title:"Electric Signs & Outline Lighting", ch:6, desc:"Sign circuits, ballasts, disconnects, LED signs."},
+      {art:"625", title:"Electric Vehicle Charging Systems", ch:6, desc:"EVSE installation, branch circuits, load management, interactive systems."},
+      {art:"680", title:"Swimming Pools, Fountains & Similar", ch:6, desc:"Equipotential bonding grid, GFCI protection, clearances from water, underwater lighting."},
+      {art:"690", title:"Solar Photovoltaic (PV) Systems", ch:6, desc:"System sizing, disconnects, grounding, rapid shutdown, module-level requirements."},
+      {art:"694", title:"Wind Electric Systems", ch:6, desc:"Small wind systems, turbine disconnects, output circuits."},
+      {art:"695", title:"Fire Pumps", ch:6, desc:"Power supply reliability, conductor sizing (125% FLC), overcurrent protection, disconnect rules."},
+      {art:"700", title:"Emergency Systems", ch:7, desc:"Legally required. Transfer in 10 seconds. Separate wiring, periodic testing, generator requirements."},
+      {art:"701", title:"Legally Required Standby Systems", ch:7, desc:"Transfer within 60 seconds. Less critical than emergency but legally mandated."},
+      {art:"702", title:"Optional Standby Systems", ch:7, desc:"Not legally required. Home generators, portable generators, transfer switches."},
+      {art:"705", title:"Interconnected Electric Power Production Sources", ch:7, desc:"Grid-tied systems, utility interconnection, synchronization, islanding protection."},
+      {art:"706", title:"Energy Storage Systems", ch:7, desc:"Battery energy storage, disconnects, overcurrent protection, ventilation, fire suppression."},
+      {art:"760", title:"Fire Alarm Systems", ch:7, desc:"Power-limited and non-power-limited circuits. Wiring methods, circuit integrity."},
+      {art:"770", title:"Optical Fiber Cables & Raceways", ch:7, desc:"Installation in buildings. Listing requirements, grounding of non-current-carrying members."},
+      {art:"800", title:"Communications Circuits", ch:8, desc:"Telephone, data, broadband. Independent of Ch 1-7 unless referenced. Grounding, protection."},
+      {art:"810", title:"Radio & Television Equipment", ch:8, desc:"Antenna installations, lead-in conductors, grounding."},
+      {art:"820", title:"Community Antenna TV & Radio Distribution", ch:8, desc:"CATV coaxial cable installation, grounding, protection."},
+      {art:"840", title:"Premises-Powered Broadband", ch:8, desc:"Network-powered broadband systems. Grounding, cable routing."},
+    ];
+
+    function filterNEC() {
+      const q = document.getElementById('nec-search').value.toLowerCase();
+      const el = document.getElementById('nec-results');
+      const filtered = q ? necArticles.filter(a =>
+        a.art.includes(q) || a.title.toLowerCase().includes(q) || a.desc.toLowerCase().includes(q)
+      ) : necArticles.slice(0, 15);
+      el.innerHTML = filtered.slice(0, 30).map(a => `
+        <div class="bg-zinc-800 p-4 rounded-xl flex gap-4 items-start card-hover cursor-default">
+          <span class="text-red-500 font-mono font-bold text-lg min-w-[60px]">${a.art}</span>
+          <div>
+            <p class="font-semibold">${a.title} <span class="text-xs text-zinc-500 ml-2">Ch. ${a.ch}</span></p>
+            <p class="text-sm text-zinc-400 mt-1">${a.desc}</p>
+          </div>
+        </div>
+      `).join('');
+      if (filtered.length === 0) el.innerHTML = '<p class="text-zinc-500 text-center py-4">No articles found. Try "grounding", "motors", or "250".</p>';
     }
+
+    // ===========================
+    // CALCULATORS (Real formulas from Electrician repo)
+    // ===========================
+
+    // NEC Table 310.16 Ampacity Data
+    const ampacity = {
+      cu: {
+        60:  [{awg:'14',a:15},{awg:'12',a:20},{awg:'10',a:30},{awg:'8',a:40},{awg:'6',a:55},{awg:'4',a:70},{awg:'3',a:85},{awg:'2',a:95},{awg:'1',a:110},{awg:'1/0',a:125},{awg:'2/0',a:145},{awg:'3/0',a:165},{awg:'4/0',a:195}],
+        75:  [{awg:'14',a:20},{awg:'12',a:25},{awg:'10',a:35},{awg:'8',a:50},{awg:'6',a:65},{awg:'4',a:85},{awg:'3',a:100},{awg:'2',a:115},{awg:'1',a:130},{awg:'1/0',a:150},{awg:'2/0',a:175},{awg:'3/0',a:200},{awg:'4/0',a:230}],
+        90:  [{awg:'14',a:25},{awg:'12',a:30},{awg:'10',a:40},{awg:'8',a:55},{awg:'6',a:75},{awg:'4',a:95},{awg:'3',a:115},{awg:'2',a:130},{awg:'1',a:145},{awg:'1/0',a:170},{awg:'2/0',a:195},{awg:'3/0',a:225},{awg:'4/0',a:260}]
+      },
+      al: {
+        60:  [{awg:'12',a:15},{awg:'10',a:25},{awg:'8',a:30},{awg:'6',a:40},{awg:'4',a:55},{awg:'3',a:65},{awg:'2',a:75},{awg:'1',a:85},{awg:'1/0',a:100},{awg:'2/0',a:115},{awg:'3/0',a:130},{awg:'4/0',a:150}],
+        75:  [{awg:'12',a:20},{awg:'10',a:30},{awg:'8',a:40},{awg:'6',a:50},{awg:'4',a:65},{awg:'3',a:75},{awg:'2',a:90},{awg:'1',a:100},{awg:'1/0',a:120},{awg:'2/0',a:135},{awg:'3/0',a:155},{awg:'4/0',a:180}],
+        90:  [{awg:'12',a:25},{awg:'10',a:35},{awg:'8',a:45},{awg:'6',a:60},{awg:'4',a:75},{awg:'3',a:85},{awg:'2',a:100},{awg:'1',a:115},{awg:'1/0',a:135},{awg:'2/0',a:150},{awg:'3/0',a:175},{awg:'4/0',a:205}]
+      }
+    };
+
+    function calcWire() {
+      const amps = parseFloat(document.getElementById('wire-amps').value);
+      if (!amps || amps <= 0) return;
+      const temp = document.getElementById('wire-temp').value;
+      const mat = document.getElementById('wire-material').value;
+      const cont = document.getElementById('wire-cont').value === 'yes';
+      const required = cont ? amps * 1.25 : amps;
+      const table = ampacity[mat][temp];
+      const match = table.find(w => w.a >= required);
+      const el = document.getElementById('wire-result');
+      if (match) {
+        el.innerHTML = `
+          <span class="text-5xl font-bold text-emerald-400">${match.awg} AWG</span>
+          <p class="text-sm text-zinc-400 mt-2">${mat==='cu'?'Copper':'Aluminum'} @ ${temp}&deg;C &bull; Rated ${match.a}A</p>
+          ${cont ? `<p class="text-xs text-yellow-500 mt-1">125% continuous: ${required.toFixed(1)}A required</p>` : ''}
+          <p class="text-xs text-zinc-500 mt-1">NEC Table 310.16</p>`;
+      } else {
+        el.innerHTML = `<span class="text-3xl text-red-500">Exceeds 4/0</span><p class="text-sm text-zinc-400 mt-2">Use kcmil conductors &mdash; consult NEC Table 310.16</p>`;
+      }
+    }
+
+    // Voltage Drop — Real formula from Electrician repo
+    const WIRE_CMA = {'14':4110,'12':6530,'10':10380,'8':16510,'6':26240,'4':41740,'3':52620,'2':66360,'1':83690,'1/0':105600,'2/0':133100,'3/0':167800,'4/0':211600};
 
     function calcVD() {
       const amps = parseFloat(document.getElementById('vd-amps').value);
       const feet = parseFloat(document.getElementById('vd-feet').value);
+      const cma = parseFloat(document.getElementById('vd-wire').value);
+      const srcV = parseFloat(document.getElementById('vd-voltage').value);
+      const phase = parseInt(document.getElementById('vd-phase').value);
+      const K = parseFloat(document.getElementById('vd-mat').value);
       if (!amps || !feet) return;
-      const vd = (2 * 12.9 * amps * feet) / 10380;
-      const percent = (vd / 120 * 100).toFixed(1);
-      document.getElementById('vd-result').innerHTML = `<span class="text-5xl">${percent}%</span><br><span class="text-sm text-zinc-400">120V • Max 3% allowed</span>`;
+      const multiplier = phase === 1 ? 2 : Math.sqrt(3);
+      const vdrop = (multiplier * K * amps * feet) / cma;
+      const pct = (vdrop / srcV * 100).toFixed(2);
+      const loadV = (srcV - vdrop).toFixed(1);
+      const powerLoss = (amps * vdrop).toFixed(1);
+      let rating, rColor;
+      if (pct <= 2) { rating = 'EXCELLENT'; rColor = 'text-emerald-400'; }
+      else if (pct <= 3) { rating = 'GOOD (within NEC)'; rColor = 'text-emerald-400'; }
+      else if (pct <= 5) { rating = 'MARGINAL'; rColor = 'text-yellow-500'; }
+      else { rating = 'NON-COMPLIANT'; rColor = 'text-red-500'; }
+      document.getElementById('vd-result').innerHTML = `
+        <span class="text-5xl font-bold ${rColor}">${pct}%</span>
+        <p class="text-sm ${rColor} mt-1 font-medium">${rating}</p>
+        <div class="grid grid-cols-3 gap-4 mt-4 text-sm">
+          <div><span class="text-zinc-500">Drop</span><br><span class="font-mono">${vdrop.toFixed(2)}V</span></div>
+          <div><span class="text-zinc-500">Load Voltage</span><br><span class="font-mono">${loadV}V</span></div>
+          <div><span class="text-zinc-500">Power Loss</span><br><span class="font-mono">${powerLoss}W</span></div>
+        </div>
+        <p class="text-xs text-zinc-500 mt-3">${phase === 1 ? 'Single' : 'Three'}-phase &bull; ${srcV}V &bull; K=${K}</p>`;
     }
 
+    // Ohm's Law Power Wheel — Full 12-formula solver from Electrician repo
     function calcOhm() {
-      const mode = document.getElementById('ohm-mode').value;
-      const v1 = parseFloat(document.getElementById('ohm1').value);
-      const v2 = parseFloat(document.getElementById('ohm2').value);
-      let result = 0;
-      if (mode === 'v') result = v1 * v2;
-      else if (mode === 'i') result = v1 / v2;
-      else if (mode === 'r') result = v1 / v2;
-      document.getElementById('ohm-result').innerHTML = `<span class="text-5xl">${result.toFixed(2)}</span>`;
+      let V = parseFloat(document.getElementById('ohm-v').value) || null;
+      let I = parseFloat(document.getElementById('ohm-i').value) || null;
+      let R = parseFloat(document.getElementById('ohm-r').value) || null;
+      let P = parseFloat(document.getElementById('ohm-p').value) || null;
+      const known = [V,I,R,P].filter(x => x !== null).length;
+      if (known < 2) { document.getElementById('ohm-result').innerHTML = '<span class="text-yellow-500">Enter at least 2 values</span>'; return; }
+      // Solve all unknowns
+      if (!V && I && R) V = I * R;
+      if (!V && P && I) V = P / I;
+      if (!V && P && R) V = Math.sqrt(P * R);
+      if (!I && V && R) I = V / R;
+      if (!I && P && V) I = P / V;
+      if (!I && P && R) I = Math.sqrt(P / R);
+      if (!R && V && I) R = V / I;
+      if (!R && V && P) R = (V * V) / P;
+      if (!R && P && I) R = P / (I * I);
+      if (!P && V && I) P = V * I;
+      if (!P && V && R) P = (V * V) / R;
+      if (!P && I && R) P = I * I * R;
+      const fmt = (n) => n >= 1e6 || (n > 0 && n < 0.001) ? n.toExponential(3) : parseFloat(n.toPrecision(6));
+      document.getElementById('ohm-result').innerHTML = `
+        <div class="grid grid-cols-2 gap-4">
+          <div class="bg-zinc-800 p-4 rounded-xl"><span class="text-zinc-500 text-xs">Voltage</span><br><span class="text-2xl font-mono text-emerald-400">${fmt(V)} V</span></div>
+          <div class="bg-zinc-800 p-4 rounded-xl"><span class="text-zinc-500 text-xs">Current</span><br><span class="text-2xl font-mono text-emerald-400">${fmt(I)} A</span></div>
+          <div class="bg-zinc-800 p-4 rounded-xl"><span class="text-zinc-500 text-xs">Resistance</span><br><span class="text-2xl font-mono text-emerald-400">${fmt(R)} &Omega;</span></div>
+          <div class="bg-zinc-800 p-4 rounded-xl"><span class="text-zinc-500 text-xs">Power</span><br><span class="text-2xl font-mono text-emerald-400">${fmt(P)} W</span></div>
+        </div>`;
     }
 
-    let currentQuestion = 0;
-    const quizData = [
-      {q: "All 120-volt, 15- and 20-ampere branch circuits supplying outlets in dwelling units shall be protected by AFCI, except:", a: ["Kitchens", "Bathrooms", "Laundry areas", "Garages"], correct: 0},
-      {q: "The minimum size equipment grounding conductor for a 200A feeder is:", a: ["6 AWG", "8 AWG", "10 AWG", "12 AWG"], correct: 0},
-      {q: "Overhead service conductors must have a clearance of ___ above a residential driveway.", a: ["10 ft", "12 ft", "18 ft", "22 ft"], correct: 2},
-      {q: "NEC Article 250 covers:", a: ["Wiring methods", "Grounding and bonding", "Motors", "Lighting"], correct: 1},
-      {q: "Maximum voltage drop recommended for feeders + branch circuits is:", a: ["3%", "5%", "8%", "10%"], correct: 1}
+    // NEC Article 220 Dwelling Load Calculator
+    function calcLoad() {
+      const sqft = parseFloat(document.getElementById('load-sqft').value) || 0;
+      const saCircuits = parseInt(document.getElementById('load-sa').value) || 2;
+      const hasLaundry = document.getElementById('load-laundry').value === 'yes';
+      const fixedVA = parseFloat(document.getElementById('load-fixed').value) || 0;
+      const lightingVA = sqft * 3;
+      const saVA = saCircuits * 1500;
+      const laundryVA = hasLaundry ? 1500 : 0;
+      const totalConnected = lightingVA + saVA + laundryVA;
+      // NEC 220.42 demand factor
+      const first3000 = Math.min(totalConnected, 3000);
+      const remainder = Math.max(totalConnected - 3000, 0);
+      const demandVA = first3000 + (remainder * 0.35);
+      const totalVA = demandVA + fixedVA;
+      const serviceAmps = totalVA / 240;
+      // Determine service size
+      let serviceSize = '100A';
+      if (serviceAmps > 100) serviceSize = '150A';
+      if (serviceAmps > 150) serviceSize = '200A';
+      if (serviceAmps > 200) serviceSize = '400A';
+      document.getElementById('load-result').innerHTML = `
+        <div class="text-left space-y-2 text-sm">
+          <div class="flex justify-between border-b border-zinc-800 pb-2"><span class="text-zinc-400">General Lighting (${sqft} sq ft &times; 3 VA)</span><span class="font-mono">${lightingVA.toLocaleString()} VA</span></div>
+          <div class="flex justify-between border-b border-zinc-800 pb-2"><span class="text-zinc-400">Small Appliance (${saCircuits} &times; 1500 VA)</span><span class="font-mono">${saVA.toLocaleString()} VA</span></div>
+          <div class="flex justify-between border-b border-zinc-800 pb-2"><span class="text-zinc-400">Laundry</span><span class="font-mono">${laundryVA.toLocaleString()} VA</span></div>
+          <div class="flex justify-between border-b border-zinc-800 pb-2"><span class="text-zinc-400">Total Connected</span><span class="font-mono">${totalConnected.toLocaleString()} VA</span></div>
+          <div class="flex justify-between border-b border-zinc-800 pb-2"><span class="text-zinc-400">After Demand (220.42): First 3000 @ 100% + rest @ 35%</span><span class="font-mono">${demandVA.toLocaleString()} VA</span></div>
+          <div class="flex justify-between border-b border-zinc-800 pb-2"><span class="text-zinc-400">Fixed Appliances</span><span class="font-mono">${fixedVA.toLocaleString()} VA</span></div>
+          <div class="flex justify-between text-lg font-bold mt-2"><span class="vader-red">Total Load</span><span class="text-emerald-400 font-mono">${totalVA.toLocaleString()} VA</span></div>
+          <div class="flex justify-between text-lg font-bold"><span class="vader-red">Service Amps (÷ 240V)</span><span class="text-emerald-400 font-mono">${serviceAmps.toFixed(1)} A</span></div>
+        </div>
+        <div class="mt-4 p-3 bg-zinc-800 rounded-xl text-center">
+          <span class="text-zinc-400">Recommended Service:</span>
+          <span class="text-2xl font-bold text-emerald-400 ml-2">${serviceSize}</span>
+        </div>`;
+    }
+
+    // ===========================
+    // QUIZ ENGINE (25 real NEC questions with SRS)
+    // ===========================
+    const allQuizData = [
+      // NEC Code questions
+      {q:"What is the maximum number of disconnects allowed for a single service?", a:["4","6","8","10"], correct:1, cat:"NEC Code", diff:"apprentice", ref:"230.71", exp:"NEC 230.71(A): Service disconnecting means shall consist of not more than six switches or six circuit breakers."},
+      {q:"NEC Article 250 covers:", a:["Wiring methods","Grounding and bonding","Motors","Lighting"], correct:1, cat:"NEC Code", diff:"apprentice", ref:"Art. 250", exp:"Article 250 is entirely dedicated to grounding and bonding requirements."},
+      {q:"Maximum voltage drop recommended for feeders + branch circuits combined is:", a:["3%","5%","8%","10%"], correct:1, cat:"NEC Code", diff:"journeyman", ref:"210.19(A) FPN", exp:"NEC recommends max 3% for branch circuits and 5% total for feeder + branch combined."},
+      {q:"Overhead service conductors must have a clearance of ___ above a residential driveway.", a:["10 ft","12 ft","18 ft","22 ft"], correct:2, cat:"NEC Code", diff:"journeyman", ref:"230.24(B)", exp:"18 ft clearance required above areas subject to truck traffic (driveways)."},
+      {q:"The minimum dwelling unit service rating per NEC is:", a:["60A","100A","150A","200A"], correct:1, cat:"NEC Code", diff:"apprentice", ref:"230.79(C)", exp:"NEC 230.79(C): Minimum 100A for a single-family dwelling."},
+      {q:"Where is AFCI protection required in dwelling units?", a:["Only bedrooms","All habitable rooms","Kitchen & bath only","Outdoor receptacles"], correct:1, cat:"NEC Code", diff:"journeyman", ref:"210.12(A)", exp:"NEC 210.12(A) requires AFCI for kitchens, family rooms, dining rooms, living rooms, bedrooms, sunrooms, recreation rooms, closets, hallways, laundry areas, and similar."},
+      {q:"What is the maximum continuous load on a 20A breaker?", a:["15A","16A","18A","20A"], correct:1, cat:"NEC Code", diff:"journeyman", ref:"210.20(A)", exp:"NEC 210.20(A): Continuous load shall not exceed 80% of the overcurrent device rating. 20A × 0.80 = 16A."},
+      {q:"NEC Article 700 covers:", a:["Fire alarm systems","Emergency systems","Optional standby","Energy storage"], correct:1, cat:"NEC Code", diff:"master", ref:"Art. 700", exp:"Article 700 covers emergency systems that are legally required and must transfer within 10 seconds."},
+      // Theory questions
+      {q:"Ohm's Law states that Voltage equals:", a:["Current × Resistance","Power ÷ Resistance","Current ÷ Resistance","Resistance ÷ Current"], correct:0, cat:"Theory", diff:"apprentice", ref:"Ohm's Law", exp:"V = I × R is the fundamental relationship. Also: I = V/R and R = V/I."},
+      {q:"In a parallel circuit, what remains constant across all branches?", a:["Current","Resistance","Voltage","Power"], correct:2, cat:"Theory", diff:"apprentice", ref:"Circuit Theory", exp:"In parallel circuits, voltage is the same across all parallel branches. Current divides."},
+      {q:"What is the power dissipated by a 10-ohm resistor carrying 3 amps?", a:["30W","90W","300W","9W"], correct:1, cat:"Theory", diff:"journeyman", ref:"P = I²R", exp:"P = I²R = 3² × 10 = 9 × 10 = 90 watts."},
+      {q:"The relationship between kW and kVA is determined by:", a:["Voltage","Power factor","Frequency","Impedance"], correct:1, cat:"Theory", diff:"journeyman", ref:"AC Theory", exp:"kW = kVA × Power Factor. PF = cos(θ) where θ is the phase angle."},
+      // Safety questions
+      {q:"The purpose of Lockout/Tagout (LOTO) is to:", a:["Speed up repairs","Ensure equipment is de-energized during maintenance","Test equipment under load","Ground portable tools"], correct:1, cat:"Safety", diff:"apprentice", ref:"OSHA 1910.147", exp:"LOTO ensures machines are properly shut off and cannot be restarted during maintenance or repair."},
+      {q:"Arc flash temperatures can reach approximately:", a:["5,000°F","15,000°F","35,000°F","100,000°F"], correct:2, cat:"Safety", diff:"journeyman", ref:"NFPA 70E", exp:"Arc flash can reach ~35,000°F — roughly 4 times the temperature of the sun's surface."},
+      {q:"Per NFPA 70E, the minimum approach distance to exposed energized parts at 480V is:", a:["12 inches","36 inches","42 inches","48 inches"], correct:2, cat:"Safety", diff:"master", ref:"NFPA 70E 130.4", exp:"NFPA 70E Table 130.4(E)(a) specifies restricted approach boundaries based on voltage."},
+      // Practical questions
+      {q:"What tool is used to measure wire diameter?", a:["Wire gauge / micrometer","Voltmeter","Megger","Ammeter"], correct:0, cat:"Practical", diff:"apprentice", ref:"Tools", exp:"A wire gauge or micrometer measures physical wire diameter. A wire gauge is the standard field tool."},
+      {q:"The standard residential wire color for a grounded (neutral) conductor is:", a:["Green","Red","White","Black"], correct:2, cat:"Practical", diff:"apprentice", ref:"200.6", exp:"NEC 200.6: Grounded conductors must be identified by white or gray insulation."},
+      {q:"What size breaker is required for a 12 AWG copper branch circuit?", a:["15A","20A","25A","30A"], correct:1, cat:"Practical", diff:"apprentice", ref:"240.4(D)", exp:"NEC 240.4(D): 12 AWG copper is protected at maximum 20A."},
+      // Troubleshooting
+      {q:"A motor overheats but doesn't trip its overloads. Most likely cause:", a:["Overloads correctly sized","Single-phasing or blocked ventilation","Motor running below FLC","Power supply too high"], correct:1, cat:"Troubleshooting", diff:"master", ref:"Art. 430", exp:"Single-phasing, loose connections, blocked ventilation, or incorrectly sized overload heaters are common causes."},
+      {q:"A GFCI trips repeatedly on a circuit with no apparent ground fault. Check first:", a:["The GFCI is defective","Shared neutrals downstream","The breaker amperage","Wire insulation color"], correct:1, cat:"Troubleshooting", diff:"journeyman", ref:"210.8", exp:"Shared (multi-circuit) neutrals downstream of a GFCI will cause nuisance tripping due to current imbalance."},
+      // Load Calculations
+      {q:"General lighting load for a dwelling is calculated at:", a:["1.5 VA/sq ft","3 VA/sq ft","5 VA/sq ft","10 VA/sq ft"], correct:1, cat:"NEC Code", diff:"apprentice", ref:"220.12", exp:"NEC Table 220.12: Dwelling units use 3 VA per square foot for general lighting load calculations."},
+      {q:"The demand factor applied to the first 10,000 VA under the optional method (220.82) is:", a:["35%","40%","80%","100%"], correct:3, cat:"NEC Code", diff:"journeyman", ref:"220.82", exp:"NEC 220.82: First 10,000 VA at 100%, remainder at 40%."},
+      {q:"How many small-appliance circuits are required minimum for a dwelling kitchen?", a:["1","2","3","4"], correct:1, cat:"NEC Code", diff:"apprentice", ref:"210.11(C)(1)", exp:"NEC 210.11(C)(1): A minimum of two 20A small-appliance branch circuits must serve the kitchen and dining area."},
+      // Grounding & Bonding
+      {q:"The minimum size equipment grounding conductor for a 200A feeder is:", a:["6 AWG Cu","8 AWG Cu","10 AWG Cu","4 AWG Cu"], correct:0, cat:"NEC Code", diff:"journeyman", ref:"250.122", exp:"NEC Table 250.122: For a 200A overcurrent device, minimum EGC is 6 AWG copper."},
+      {q:"The grounding electrode conductor (GEC) is sized based on:", a:["The overcurrent device rating","The largest service-entrance conductor","The panel bus rating","The building square footage"], correct:1, cat:"NEC Code", diff:"master", ref:"250.66", exp:"NEC Table 250.66 sizes the GEC based on the largest ungrounded service-entrance conductor."},
     ];
 
+    let quizPool = [...allQuizData];
+    let currentQuestion = 0;
+    let quizScore = 0;
+    let quizAnswered = 0;
+    let currentDifficulty = 'all';
+
+    function setDifficulty(d) {
+      currentDifficulty = d;
+      document.querySelectorAll('.diff-btn').forEach(b => {
+        b.classList.toggle('bg-red-600', b.dataset.diff === d);
+        b.classList.toggle('bg-zinc-800', b.dataset.diff !== d);
+      });
+      quizPool = d === 'all' ? [...allQuizData] : allQuizData.filter(q => q.diff === d);
+      quizPool.sort(() => Math.random() - 0.5);
+      currentQuestion = 0;
+      quizScore = 0;
+      quizAnswered = 0;
+      document.getElementById('quiz-count').textContent = quizPool.length;
+      loadQuiz();
+      updateQuizScore();
+    }
+
     function loadQuiz() {
-      const q = quizData[currentQuestion];
-      document.getElementById('quiz-question').innerText = q.q;
+      if (quizPool.length === 0) return;
+      const q = quizPool[currentQuestion % quizPool.length];
+      document.getElementById('quiz-difficulty-badge').textContent = q.diff.toUpperCase();
+      document.getElementById('quiz-difficulty-badge').className = `px-3 py-1 rounded-full text-xs ${q.diff==='apprentice'?'bg-emerald-900 text-emerald-400':q.diff==='journeyman'?'bg-yellow-900 text-yellow-400':'bg-red-900 text-red-400'}`;
+      document.getElementById('quiz-category-badge').textContent = q.cat;
+      document.getElementById('quiz-nec-ref').textContent = q.ref || '';
+      document.getElementById('quiz-question').textContent = q.q;
       const opts = document.getElementById('quiz-options');
       opts.innerHTML = '';
       q.a.forEach((ans, i) => {
         const btn = document.createElement('button');
-        btn.className = "w-full text-left px-6 py-4 bg-zinc-800 hover:bg-zinc-700 rounded-2xl transition";
-        btn.innerText = ans;
+        btn.className = "quiz-btn w-full text-left px-6 py-4 bg-zinc-800 hover:bg-zinc-700 rounded-2xl transition";
+        btn.textContent = ans;
         btn.onclick = () => checkAnswer(i);
         opts.appendChild(btn);
       });
-      document.getElementById('quiz-feedback').innerHTML = '';
+      document.getElementById('quiz-feedback').classList.add('hidden');
+      document.getElementById('quiz-explanation').classList.add('hidden');
     }
 
     function checkAnswer(selected) {
-      const correct = quizData[currentQuestion].correct;
+      const q = quizPool[currentQuestion % quizPool.length];
       const fb = document.getElementById('quiz-feedback');
-      if (selected === correct) fb.innerHTML = `<span class="text-emerald-400">✓ CORRECT — The Force is strong.</span>`;
-      else fb.innerHTML = `<span class="text-red-600">✗ Incorrect. Correct: ${quizData[currentQuestion].a[correct]}</span>`;
-      setTimeout(() => { currentQuestion = (currentQuestion + 1) % quizData.length; loadQuiz(); }, 1800);
+      const exp = document.getElementById('quiz-explanation');
+      const btns = document.getElementById('quiz-options').children;
+      // Highlight correct/wrong
+      for (let i = 0; i < btns.length; i++) {
+        btns[i].disabled = true;
+        if (i === q.correct) btns[i].className = "quiz-btn w-full text-left px-6 py-4 bg-emerald-900 border-2 border-emerald-500 rounded-2xl";
+        else if (i === selected && selected !== q.correct) btns[i].className = "quiz-btn w-full text-left px-6 py-4 bg-red-900 border-2 border-red-500 rounded-2xl";
+      }
+      quizAnswered++;
+      if (selected === q.correct) {
+        quizScore++;
+        fb.innerHTML = '<span class="text-emerald-400 text-lg"><i class="fa-solid fa-check mr-2"></i>CORRECT — The Force is strong with you.</span>';
+        fb.className = "mt-6 p-4 rounded-2xl bg-emerald-900/30";
+      } else {
+        fb.innerHTML = `<span class="text-red-400 text-lg"><i class="fa-solid fa-xmark mr-2"></i>INCORRECT — Correct: ${q.a[q.correct]}</span>`;
+        fb.className = "mt-6 p-4 rounded-2xl bg-red-900/30";
+      }
+      fb.classList.remove('hidden');
+      exp.textContent = q.exp;
+      exp.classList.remove('hidden');
+      updateQuizScore();
+      setTimeout(() => { currentQuestion++; loadQuiz(); }, 2500);
     }
 
-    function addChat(msg, isUser) {
+    function updateQuizScore() {
+      document.getElementById('quiz-score').textContent = quizScore;
+      document.getElementById('quiz-total').textContent = quizAnswered;
+      updateMastery();
+    }
+
+    // ===========================
+    // AI INTERVIEW SIMULATOR
+    // ===========================
+    const interviewQuestions = {
+      apprentice: [
+        {q:"What is Ohm's Law formula and how do you apply it on the job?", keywords:["V=IR","voltage","current","resistance","formula"]},
+        {q:"How do you verify a circuit is de-energized before working on it?", keywords:["meter","test","lockout","tagout","LOTO","verify","absent"]},
+        {q:"What are the wire color codes for a 120/240V residential system?", keywords:["black","white","red","green","bare","neutral","hot","ground"]},
+        {q:"What size breaker protects a 12 AWG copper circuit?", keywords:["20","amp","240.4","NEC"]},
+        {q:"What PPE is required for basic panel work?", keywords:["gloves","safety glasses","arc","flash","PPE","voltage rated"]},
+        {q:"Describe the steps of a proper Lockout/Tagout procedure.", keywords:["notify","shut down","isolate","lock","tag","verify","de-energized"]},
+        {q:"What is the difference between series and parallel circuits?", keywords:["series","same current","parallel","same voltage","divides"]},
+        {q:"What is the minimum service size for a single-family dwelling?", keywords:["100","amp","230.79"]},
+        {q:"What does GFCI stand for and where is it required?", keywords:["ground fault circuit interrupter","bathroom","kitchen","outdoor","garage","wet"]},
+        {q:"Name three types of conduit and when you would use each.", keywords:["EMT","PVC","rigid","RMC","flexible","FMC","outdoor","indoor"]},
+      ],
+      journeyman: [
+        {q:"How do you calculate voltage drop for a long branch circuit run?", keywords:["2","K","I","D","CMA","formula","310.16","3%","distance"]},
+        {q:"What is the difference between grounding and bonding?", keywords:["grounding","earth","path","bonding","connect","metallic","continuity","250"]},
+        {q:"Explain NEC 210.19(A)(1) — what does it cover?", keywords:["branch circuit","conductor","sizing","continuous","125%","load"]},
+        {q:"How do you determine demand load for a dwelling using Article 220?", keywords:["3 VA","square foot","220","demand","factor","first 3000","35%"]},
+        {q:"Where is AFCI protection required per the current NEC?", keywords:["bedrooms","living","dining","kitchen","habitable","210.12"]},
+        {q:"What are the working clearance specifications per NEC 110.26?", keywords:["3 feet","30 inch","6.5","depth","width","height"]},
+        {q:"How do you size feeders for a multifamily dwelling?", keywords:["demand","factor","215","connected","load","continuous","125%"]},
+        {q:"Explain the 80% rule for circuit breakers.", keywords:["80%","continuous","load","125%","conductor","3 hours"]},
+        {q:"What wire size is needed for a 100A feeder?", keywords:["3 AWG","THHN","copper","310.16","75"]},
+        {q:"How do you calculate conduit fill per NEC Chapter 9?", keywords:["40%","one","31%","two","fill","table","chapter 9"]},
+      ],
+      master: [
+        {q:"Design a 400A residential service — walk me through your calculations.", keywords:["220","demand","load","conductor","GEC","250.66","grounding","disconnect"]},
+        {q:"Explain harmonic distortion on a three-phase system and mitigation strategies.", keywords:["harmonic","3rd","triplen","neutral","oversizing","filter","K-rated","transformer"]},
+        {q:"What is the difference between interrupting rating and ampacity?", keywords:["AIC","interrupting","fault","current","ampacity","continuous","conductor"]},
+        {q:"Walk me through NEC Article 240.4(B) exception analysis.", keywords:["240.4","next size up","overcurrent","800A","exception","conductor"]},
+        {q:"Describe NEC Article 700 emergency system requirements.", keywords:["700","emergency","10 seconds","transfer","separate","wiring","testing","generator"]},
+        {q:"How would you troubleshoot a motor overheating without tripping overloads?", keywords:["single-phasing","ventilation","loose","connection","heater","sized","overload"]},
+        {q:"Explain the requirements for solar PV rapid shutdown per 690.12.", keywords:["690.12","rapid","shutdown","30 seconds","module","array","boundary","controlled"]},
+        {q:"What are the key differences between NEC 700, 701, and 702?", keywords:["emergency","legally required","optional","10 seconds","60 seconds","standby"]},
+        {q:"Size a three-phase feeder for a 150HP motor at 480V.", keywords:["430","FLC","Table","125%","conductor","overload","disconnect"]},
+        {q:"How do you coordinate ground fault protection on a 480V system?", keywords:["coordination","time-current","selective","zone","GFP","1200A"]},
+      ]
+    };
+
+    let ivLevel = 'journeyman';
+    let ivQnum = 0;
+    let ivScore = 0;
+    let ivQuestions = [];
+
+    function resetInterview() {
+      ivLevel = document.getElementById('interview-level').value;
+      ivQnum = 0;
+      ivScore = 0;
+      ivQuestions = [...interviewQuestions[ivLevel]].sort(() => Math.random() - 0.5);
       const chat = document.getElementById('interview-chat');
-      const bubble = document.createElement('div');
-      bubble.className = `flex ${isUser ? 'justify-end' : 'justify-start'}`;
-      bubble.innerHTML = `<div class="${isUser ? 'bg-red-600' : 'bg-zinc-700'} max-w-xs px-5 py-3 rounded-3xl \( {isUser ? 'rounded-br-none' : 'rounded-bl-none'}"> \){msg}</div>`;
-      chat.appendChild(bubble);
-      chat.scrollTop = chat.scrollHeight;
+      chat.innerHTML = '';
+      document.getElementById('iv-qnum').textContent = '0';
+      document.getElementById('iv-qtotal').textContent = ivQuestions.length;
+      document.getElementById('iv-score').textContent = '0';
+      setTimeout(() => {
+        addChat(`Welcome, Trooper. This is your ${ivLevel.toUpperCase()}-level NEC interview. I will ask ${ivQuestions.length} questions. Answer thoroughly with NEC references when possible.`, false);
+        setTimeout(() => askNextQuestion(), 1200);
+      }, 500);
+    }
+
+    function askNextQuestion() {
+      if (ivQnum >= ivQuestions.length) {
+        const pct = Math.round((ivScore / (ivQuestions.length * 10)) * 100);
+        addChat(`Interview complete. Final score: ${ivScore}/${ivQuestions.length * 10} (${pct}%). ${pct >= 70 ? 'You have passed. The Empire is pleased.' : 'You have failed. Report for additional training.'}`, false);
+        return;
+      }
+      addChat(ivQuestions[ivQnum].q, false);
+      document.getElementById('iv-qnum').textContent = ivQnum + 1;
     }
 
     function sendInterview() {
@@ -242,47 +833,155 @@
       if (!text) return;
       addChat(text, true);
       input.value = '';
+      if (ivQnum >= ivQuestions.length) {
+        setTimeout(() => addChat("The interview is complete. Reset to begin a new session.", false), 600);
+        return;
+      }
+      // Score the answer via keyword matching
+      const q = ivQuestions[ivQnum];
+      const lower = text.toLowerCase();
+      const matched = q.keywords.filter(k => lower.includes(k.toLowerCase()));
+      const score = Math.min(10, Math.round((matched.length / q.keywords.length) * 10));
+      ivScore += score;
+      document.getElementById('iv-score').textContent = ivScore;
       setTimeout(() => {
-        const responses = ["Per NEC 210.19(A)...", "Article 250.122 requires...", "That is correct, Trooper.", "Incorrect. Review Table 310.16."];
-        addChat(responses[Math.floor(Math.random()*responses.length)], false);
+        let feedback;
+        if (score >= 8) feedback = `Excellent response, Trooper. ${score}/10 points. Key concepts correctly identified.`;
+        else if (score >= 5) feedback = `Acceptable. ${score}/10 points. You missed: ${q.keywords.filter(k => !lower.includes(k.toLowerCase())).slice(0, 3).join(', ')}. Study further.`;
+        else feedback = `Insufficient. ${score}/10 points. Expected keywords: ${q.keywords.slice(0, 4).join(', ')}. Review the NEC.`;
+        addChat(feedback, false);
+        ivQnum++;
+        setTimeout(() => askNextQuestion(), 1500);
       }, 800);
     }
 
-    function copyPrompt(el) {
-      const text = el.querySelector('p:last-child').innerText;
-      navigator.clipboard.writeText(text);
+    function addChat(msg, isUser) {
+      const chat = document.getElementById('interview-chat');
+      const bubble = document.createElement('div');
+      bubble.className = `flex ${isUser ? 'justify-end' : 'justify-start'} fade-in`;
+      bubble.innerHTML = `
+        <div class="${isUser ? 'bg-red-600' : 'bg-zinc-700'} max-w-sm px-5 py-3 rounded-3xl ${isUser ? 'rounded-br-none' : 'rounded-bl-none'} text-sm leading-relaxed">
+          ${isUser ? '' : '<span class="text-xs text-zinc-400 block mb-1"><i class="fa-solid fa-robot"></i> IMPERIAL EXAMINER</span>'}${msg}
+        </div>`;
+      chat.appendChild(bubble);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    // ===========================
+    // PROMPTS MARKETPLACE (Real data from Electrician-PROMPT-GENIE + prompt-marketplace)
+    // ===========================
+    const prompts = [
+      {id:1, title:"NEC Compliance Auditor", author:"VoltMaster", stars:2100, cat:"Code Compliance",
+       text:"Act as a Master Electrician and NEC inspector. Review the following load calculations and wiring plans for compliance with NFPA 70. Identify violations by article number, explain the issue, and provide the corrective action required. Format as a compliance report."},
+      {id:2, title:"Fault Finder / Troubleshooter", author:"SparkyPro", stars:1540, cat:"Troubleshooting",
+       text:"I have a [symptom, e.g., tripping GFCI]. Based on a standard 120V residential split-phase system, provide a safety-first diagnostic sequence. Start with visual inspection, then meter readings, then component isolation. Cite NEC articles for each step."},
+      {id:3, title:"Load Calculator Pro", author:"CurrentGen", stars:980, cat:"Estimation",
+       text:"Calculate the total demand load for a {square_footage} sq ft dwelling with the following appliances: {appliances}. Use NEC Article 220 standard method. Show all steps: general lighting, small appliance circuits, demand factors, and final service amperage."},
+      {id:4, title:"Safety-First Protocol", author:"Imperial Safety", stars:870, cat:"Safety Framework",
+       text:"Prioritize OSHA standards and LOTO procedures in every response. Structure: 1. Identify Hazards → 2. PPE Requirements → 3. De-energization Steps → 4. Technical Execution. Cite NFPA 70E and OSHA 1910 Subpart S."},
+      {id:5, title:"Journeyman Mentor", author:"SeniorJW", stars:1250, cat:"Training",
+       text:"You are a Senior Journeyman Electrician with 30 years in the trade. Explain complex electrical theory in practical, field-ready terms. When I describe a job site scenario, walk me through it as if we're standing at the panel together. Always reference NEC articles."},
+      {id:6, title:"Imperial Code Enforcer", author:"Sr. Imperial Engineer", stars:760, cat:"Programming",
+       text:"Act as Senior Imperial Engineer. Write production-grade, zero-bug code for NEC electrical calculations. Include error handling, logging, input validation, and comments. Support Python, Bash, and JavaScript. Deliver full file ready for Termux."},
+      {id:7, title:"Wire Size Validator", author:"VoltMaster", stars:680, cat:"Code Compliance",
+       text:"You are a Master Electrician. Validate this branch circuit: 240V, 45A continuous load, 150ft run, copper THHN. Calculate: 1) Required ampacity (125% rule), 2) AWG per Table 310.16, 3) Voltage drop, 4) Conduit fill. Cite every NEC article."},
+      {id:8, title:"NEC 250 Grounding Expert", author:"GroundMaster", stars:590, cat:"Code Compliance",
+       text:"Explain NEC 250.122 for equipment grounding conductor sizing on a 200A feeder. Include: Table 250.122 reference, distinction between GEC and EGC, bonding requirements per 250.102(C), and common field mistakes to avoid."},
+      {id:9, title:"Schematic Reasoning Chain", author:"CircuitLogic", stars:450, cat:"Analysis",
+       text:"Break down this electrical system from power source to load. Follow: Source → Overcurrent Protection → Conductors → Controls → Load. At each stage, identify the NEC article governing that component. Flag any code violations."},
+      {id:10, title:"NEC Section Extraction Chain", author:"PROMPT-GENIE", stars:380, cat:"NEC Chains",
+       text:"Step 1: Identify exact NEC articles relevant to the query. Step 2: Interpret requirements in field-accessible language. Step 3: Cross-check against safety hazards and flag ambiguities. Step 4: Synthesize using 5W1H+ framework (What, Why, Who, Where, When, How, How Well)."},
+    ];
+
+    function renderPrompts() {
+      const grid = document.getElementById('prompts-grid');
+      grid.innerHTML = prompts.map(p => `
+        <div onclick="copyPromptText(${p.id})" class="bg-zinc-900 p-6 rounded-2xl cursor-pointer card-hover" id="prompt-${p.id}">
+          <div class="flex justify-between items-start mb-3">
+            <div>
+              <p class="font-bold text-lg">${p.title}</p>
+              <p class="text-xs text-zinc-500">${p.author} &bull; <span class="text-yellow-500"><i class="fa-solid fa-star"></i> ${p.stars.toLocaleString()}</span></p>
+            </div>
+            <span class="px-3 py-1 text-xs rounded-full bg-zinc-800 text-zinc-400">${p.cat}</span>
+          </div>
+          <p class="text-sm text-zinc-300 leading-relaxed">"${p.text}"</p>
+          <p class="text-xs text-zinc-600 mt-3"><i class="fa-solid fa-copy"></i> Click to copy</p>
+        </div>
+      `).join('');
+    }
+
+    function copyPromptText(id) {
+      const p = prompts.find(x => x.id === id);
+      navigator.clipboard.writeText(p.text);
+      const el = document.getElementById('prompt-' + id);
       const orig = el.innerHTML;
-      el.innerHTML = `<span class="text-emerald-400">✓ COPIED</span>`;
+      el.innerHTML = '<div class="flex items-center justify-center h-full text-emerald-400 text-xl py-8"><i class="fa-solid fa-check mr-2"></i> COPIED TO CLIPBOARD</div>';
       setTimeout(() => el.innerHTML = orig, 1500);
     }
 
+    // ===========================
+    // TASKS (Todolite with localStorage)
+    // ===========================
     let tasks = JSON.parse(localStorage.getItem('imperialTasks')) || [];
+
     function renderTasks() {
       const ul = document.getElementById('todo-list');
       ul.innerHTML = '';
+      if (tasks.length === 0) {
+        ul.innerHTML = '<li class="text-center text-zinc-500 py-8">No tasks. The Empire is at peace... for now.</li>';
+      }
       tasks.forEach((t, i) => {
         const li = document.createElement('li');
-        li.className = `flex items-center gap-3 bg-zinc-800 px-6 py-4 rounded-2xl ${t.done ? 'line-through opacity-60' : ''}`;
-        li.innerHTML = `<input type="checkbox" \( {t.done ? 'checked' : ''} onchange="toggleTask( \){i})" class="w-5 h-5 accent-red-600"><span class="flex-1">\( {t.text}</span><button onclick="deleteTask( \){i})" class="text-red-600 hover:text-red-400"><i class="fa-solid fa-trash"></i></button>`;
+        li.className = `flex items-center gap-3 bg-zinc-800 px-5 py-4 rounded-2xl ${t.done ? 'opacity-50' : ''} fade-in`;
+        li.innerHTML = `
+          <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTask(${i})" class="w-5 h-5 accent-red-600 cursor-pointer" aria-label="Toggle task">
+          <span class="flex-1 ${t.done ? 'line-through text-zinc-500' : ''}">${t.text}</span>
+          <button onclick="deleteTask(${i})" class="text-red-600 hover:text-red-400 text-sm" aria-label="Delete task"><i class="fa-solid fa-trash"></i></button>`;
         ul.appendChild(li);
       });
+      const done = tasks.filter(t => t.done).length;
+      document.getElementById('todo-stats').textContent = tasks.length > 0 ? `${done}/${tasks.length} completed` : '';
     }
+
     function addTask() {
       const inp = document.getElementById('todo-input');
       if (!inp.value.trim()) return;
-      tasks.push({text: inp.value.trim(), done: false});
+      tasks.push({ text: inp.value.trim(), done: false });
       localStorage.setItem('imperialTasks', JSON.stringify(tasks));
       inp.value = '';
       renderTasks();
     }
-    function toggleTask(i) { tasks[i].done = !tasks[i].done; localStorage.setItem('imperialTasks', JSON.stringify(tasks)); renderTasks(); }
-    function deleteTask(i) { tasks.splice(i, 1); localStorage.setItem('imperialTasks', JSON.stringify(tasks)); renderTasks(); }
 
+    function toggleTask(i) {
+      tasks[i].done = !tasks[i].done;
+      localStorage.setItem('imperialTasks', JSON.stringify(tasks));
+      renderTasks();
+    }
+
+    function deleteTask(i) {
+      tasks.splice(i, 1);
+      localStorage.setItem('imperialTasks', JSON.stringify(tasks));
+      renderTasks();
+    }
+
+    // ===========================
+    // MASTERY SCORE
+    // ===========================
+    function updateMastery() {
+      const pct = quizAnswered > 0 ? Math.round((quizScore / quizAnswered) * 100) : 92;
+      document.getElementById('mastery-pct').textContent = pct;
+    }
+
+    // ===========================
+    // INIT
+    // ===========================
     window.onload = () => {
       switchTab(0);
-      loadQuiz();
+      filterNEC();
+      setDifficulty('all');
+      renderPrompts();
       renderTasks();
-      setTimeout(() => addChat("Welcome, Trooper. Begin your NEC interview simulation.", false), 800);
+      updateMastery();
     };
   </script>
 </body>
