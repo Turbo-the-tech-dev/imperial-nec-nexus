@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>⚡ IMPERIAL NEC COMMAND NEXUS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; }
+    .tab-active { border-bottom: 4px solid #dc2626; color: #dc2626; }
+    .vader-red { color: #dc2626; }
+    .card-hover { transition: all 0.2s; }
+    .card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgb(220 38 38 / 0.3); }
+  </style>
+</head>
+<body class="bg-zinc-950 text-white min-h-screen">
+  <div class="max-w-7xl mx-auto">
+    <nav class="bg-black border-b border-red-900 px-6 py-4 flex items-center justify-between sticky top-0 z-50">
+      <div class="flex items-center gap-3">
+        <span class="text-3xl">⚡</span>
+        <div>
+          <h1 class="text-2xl font-bold tracking-widest vader-red">IMPERIAL NEC COMMAND NEXUS</h1>
+          <p class="text-xs text-zinc-500">Turbo-the-tech-dev • Feb 25 2026 • Powered by DEATHSTAR</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-4 text-sm">
+        <div class="px-4 py-1 bg-zinc-900 rounded-full text-emerald-400 flex items-center gap-2">
+          <i class="fa-solid fa-shield-halved"></i> 92% NEC MASTERY
+        </div>
+        <button onclick="window.location.reload()" class="px-5 py-2 bg-red-600 hover:bg-red-700 rounded font-medium flex items-center gap-2">
+          <i class="fa-solid fa-rotate"></i> RESET SESSION
+        </button>
+      </div>
+    </nav>
+
+    <div class="flex border-b border-zinc-800 bg-zinc-900 overflow-x-auto">
+      <button onclick="switchTab(0)" class="tab px-8 py-4 font-medium tab-active flex items-center gap-2" id="tab-0"><i class="fa-solid fa-gauge-high"></i> HUB</button>
+      <button onclick="switchTab(1)" class="tab px-8 py-4 font-medium flex items-center gap-2" id="tab-1"><i class="fa-solid fa-calculator"></i> CALCULATORS</button>
+      <button onclick="switchTab(2)" class="tab px-8 py-4 font-medium flex items-center gap-2" id="tab-2"><i class="fa-solid fa-question-circle"></i> QUIZZES</button>
+      <button onclick="switchTab(3)" class="tab px-8 py-4 font-medium flex items-center gap-2" id="tab-3"><i class="fa-solid fa-comments"></i> AI INTERVIEW</button>
+      <button onclick="switchTab(4)" class="tab px-8 py-4 font-medium flex items-center gap-2" id="tab-4"><i class="fa-solid fa-sparkles"></i> PROMPTS</button>
+      <button onclick="switchTab(5)" class="tab px-8 py-4 font-medium flex items-center gap-2" id="tab-5"><i class="fa-solid fa-list-check"></i> TASKS</button>
+    </div>
+
+    <div class="p-6">
+      <!-- HUB -->
+      <div id="panel-0" class="tab-panel">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="bg-zinc-900 p-6 rounded-2xl card-hover">
+            <h2 class="text-xl font-bold mb-4 vader-red">WEEKLY CONQUESTS</h2>
+            <div class="space-y-4">
+              <div class="flex justify-between"><span>Electrician Core</span><span class="text-emerald-400">49 strikes</span></div>
+              <div class="flex justify-between"><span>DEATHSTAR Orchestrator</span><span class="text-emerald-400">22 strikes</span></div>
+              <div class="flex justify-between"><span>AI Interview Simulator</span><span class="text-emerald-400">17 strikes</span></div>
+            </div>
+          </div>
+          <div class="bg-zinc-900 p-6 rounded-2xl card-hover">
+            <h2 class="text-xl font-bold mb-4 vader-red">IMPERIAL STATUS</h2>
+            <div class="text-6xl font-bold text-red-600">466</div>
+            <p class="text-zinc-400">Contributions this quarter</p>
+            <div class="mt-6 text-xs text-zinc-500">Pull Shark ×2 • 75 repos</div>
+          </div>
+          <div class="bg-zinc-900 p-6 rounded-2xl card-hover flex flex-col justify-center items-center text-center">
+            <i class="fa-solid fa-skull text-7xl text-red-600 mb-4"></i>
+            <p class="text-2xl font-bold">Ready for inspection</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- CALCULATORS -->
+      <div id="panel-1" class="tab-panel hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="bg-zinc-900 p-6 rounded-2xl">
+            <h3 class="font-bold text-lg mb-4">Wire Size (Copper 75°C)</h3>
+            <input id="amps" type="number" placeholder="Amps (e.g. 25)" class="w-full bg-zinc-800 border border-zinc-700 rounded p-3 mb-4">
+            <button onclick="calcWire()" class="w-full bg-red-600 hover:bg-red-700 py-3 rounded font-medium">CALCULATE AWG</button>
+            <div id="wire-result" class="mt-6 text-4xl font-mono text-center text-emerald-400"></div>
+          </div>
+          <div class="bg-zinc-900 p-6 rounded-2xl">
+            <h3 class="font-bold text-lg mb-4">Voltage Drop (Single Phase)</h3>
+            <div class="grid grid-cols-2 gap-4">
+              <input id="vd-amps" type="number" placeholder="Amps" class="bg-zinc-800 border border-zinc-700 rounded p-3">
+              <input id="vd-feet" type="number" placeholder="Feet" class="bg-zinc-800 border border-zinc-700 rounded p-3">
+            </div>
+            <button onclick="calcVD()" class="mt-4 w-full bg-red-600 hover:bg-red-700 py-3 rounded font-medium">CALCULATE % DROP</button>
+            <div id="vd-result" class="mt-6 text-4xl font-mono text-center text-emerald-400"></div>
+          </div>
+          <div class="bg-zinc-900 p-6 rounded-2xl">
+            <h3 class="font-bold text-lg mb-4">Ohm's Law Solver</h3>
+            <select id="ohm-mode" class="w-full bg-zinc-800 border border-zinc-700 rounded p-3 mb-4">
+              <option value="v">Find Voltage (V = I × R)</option>
+              <option value="i">Find Current (I = V ÷ R)</option>
+              <option value="r">Find Resistance (R = V ÷ I)</option>
+            </select>
+            <div class="grid grid-cols-2 gap-4">
+              <input id="ohm1" placeholder="Value 1" class="bg-zinc-800 border border-zinc-700 rounded p-3">
+              <input id="ohm2" placeholder="Value 2" class="bg-zinc-800 border border-zinc-700 rounded p-3">
+            </div>
+            <button onclick="calcOhm()" class="mt-4 w-full bg-red-600 hover:bg-red-700 py-3 rounded font-medium">SOLVE</button>
+            <div id="ohm-result" class="mt-6 text-4xl font-mono text-center text-emerald-400"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUIZZES -->
+      <div id="panel-2" class="tab-panel hidden">
+        <div class="max-w-2xl mx-auto bg-zinc-900 p-8 rounded-3xl">
+          <h3 class="text-2xl font-bold mb-6 text-center vader-red">NEC KNOWLEDGE TEST</h3>
+          <div id="quiz-question" class="text-xl mb-8"></div>
+          <div id="quiz-options" class="space-y-3"></div>
+          <div id="quiz-feedback" class="mt-8 text-center font-medium"></div>
+        </div>
+      </div>
+
+      <!-- AI INTERVIEW -->
+      <div id="panel-3" class="tab-panel hidden">
+        <div class="max-w-2xl mx-auto bg-zinc-900 rounded-3xl overflow-hidden">
+          <div id="interview-chat" class="h-96 overflow-y-auto p-6 space-y-6"></div>
+          <div class="p-4 border-t border-zinc-800 flex gap-3">
+            <input id="interview-input" placeholder="Your answer, Trooper..." class="flex-1 bg-zinc-800 border border-zinc-700 rounded-full px-6 py-3 focus:outline-none focus:border-red-600">
+            <button onclick="sendInterview()" class="bg-red-600 hover:bg-red-700 px-8 rounded-full font-medium">SEND</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROMPTS -->
+      <div id="panel-4" class="tab-panel hidden">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div onclick="copyPrompt(this)" class="bg-zinc-900 p-6 rounded-2xl cursor-pointer card-hover">
+            <p class="font-mono text-sm text-zinc-400">Prompt #1 — Wire Size</p>
+            <p class="mt-3">"You are a Master Electrician. Validate this branch circuit: 240V, 45A continuous load, 150ft run, copper. Give AWG, conduit, and NEC articles."</p>
+          </div>
+          <div onclick="copyPrompt(this)" class="bg-zinc-900 p-6 rounded-2xl cursor-pointer card-hover">
+            <p class="font-mono text-sm text-zinc-400">Prompt #2 — Grounding</p>
+            <p class="mt-3">"Explain NEC 250.122 for equipment grounding conductor sizing on a 200A feeder. Include table reference."</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- TASKS -->
+      <div id="panel-5" class="tab-panel hidden">
+        <div class="max-w-md mx-auto bg-zinc-900 p-6 rounded-3xl">
+          <div class="flex gap-3 mb-6">
+            <input id="todo-input" placeholder="New imperial task..." class="flex-1 bg-zinc-800 border border-zinc-700 rounded-full px-6 py-3">
+            <button onclick="addTask()" class="bg-red-600 hover:bg-red-700 px-8 rounded-full">ADD</button>
+          </div>
+          <ul id="todo-list" class="space-y-3"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="text-center py-6 text-xs text-zinc-500 border-t border-zinc-900">
+    IMPERIAL NEC COMMAND NEXUS v1.0 • FOR DEMO PURPOSES ONLY • CONQUER THE CODE
+  </footer>
+
+  <script>
+    function switchTab(n) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('tab-active'));
+      document.getElementById('tab-'+n).classList.add('tab-active');
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+      document.getElementById('panel-'+n).classList.remove('hidden');
+    }
+
+    function calcWire() {
+      const amps = parseFloat(document.getElementById('amps').value);
+      let awg = '—';
+      if (amps <= 15) awg = '14 AWG';
+      else if (amps <= 20) awg = '12 AWG';
+      else if (amps <= 30) awg = '10 AWG';
+      else if (amps <= 50) awg = '8 AWG';
+      else if (amps <= 65) awg = '6 AWG';
+      else awg = '4 AWG+';
+      document.getElementById('wire-result').innerHTML = `<span class="text-5xl">${awg}</span><br><span class="text-sm text-zinc-400">NEC Table 310.16</span>`;
+    }
+
+    function calcVD() {
+      const amps = parseFloat(document.getElementById('vd-amps').value);
+      const feet = parseFloat(document.getElementById('vd-feet').value);
+      if (!amps || !feet) return;
+      const vd = (2 * 12.9 * amps * feet) / 10380;
+      const percent = (vd / 120 * 100).toFixed(1);
+      document.getElementById('vd-result').innerHTML = `<span class="text-5xl">${percent}%</span><br><span class="text-sm text-zinc-400">120V • Max 3% allowed</span>`;
+    }
+
+    function calcOhm() {
+      const mode = document.getElementById('ohm-mode').value;
+      const v1 = parseFloat(document.getElementById('ohm1').value);
+      const v2 = parseFloat(document.getElementById('ohm2').value);
+      let result = 0;
+      if (mode === 'v') result = v1 * v2;
+      else if (mode === 'i') result = v1 / v2;
+      else if (mode === 'r') result = v1 / v2;
+      document.getElementById('ohm-result').innerHTML = `<span class="text-5xl">${result.toFixed(2)}</span>`;
+    }
+
+    let currentQuestion = 0;
+    const quizData = [
+      {q: "All 120-volt, 15- and 20-ampere branch circuits supplying outlets in dwelling units shall be protected by AFCI, except:", a: ["Kitchens", "Bathrooms", "Laundry areas", "Garages"], correct: 0},
+      {q: "The minimum size equipment grounding conductor for a 200A feeder is:", a: ["6 AWG", "8 AWG", "10 AWG", "12 AWG"], correct: 0},
+      {q: "Overhead service conductors must have a clearance of ___ above a residential driveway.", a: ["10 ft", "12 ft", "18 ft", "22 ft"], correct: 2},
+      {q: "NEC Article 250 covers:", a: ["Wiring methods", "Grounding and bonding", "Motors", "Lighting"], correct: 1},
+      {q: "Maximum voltage drop recommended for feeders + branch circuits is:", a: ["3%", "5%", "8%", "10%"], correct: 1}
+    ];
+
+    function loadQuiz() {
+      const q = quizData[currentQuestion];
+      document.getElementById('quiz-question').innerText = q.q;
+      const opts = document.getElementById('quiz-options');
+      opts.innerHTML = '';
+      q.a.forEach((ans, i) => {
+        const btn = document.createElement('button');
+        btn.className = "w-full text-left px-6 py-4 bg-zinc-800 hover:bg-zinc-700 rounded-2xl transition";
+        btn.innerText = ans;
+        btn.onclick = () => checkAnswer(i);
+        opts.appendChild(btn);
+      });
+      document.getElementById('quiz-feedback').innerHTML = '';
+    }
+
+    function checkAnswer(selected) {
+      const correct = quizData[currentQuestion].correct;
+      const fb = document.getElementById('quiz-feedback');
+      if (selected === correct) fb.innerHTML = `<span class="text-emerald-400">✓ CORRECT — The Force is strong.</span>`;
+      else fb.innerHTML = `<span class="text-red-600">✗ Incorrect. Correct: ${quizData[currentQuestion].a[correct]}</span>`;
+      setTimeout(() => { currentQuestion = (currentQuestion + 1) % quizData.length; loadQuiz(); }, 1800);
+    }
+
+    function addChat(msg, isUser) {
+      const chat = document.getElementById('interview-chat');
+      const bubble = document.createElement('div');
+      bubble.className = `flex ${isUser ? 'justify-end' : 'justify-start'}`;
+      bubble.innerHTML = `<div class="${isUser ? 'bg-red-600' : 'bg-zinc-700'} max-w-xs px-5 py-3 rounded-3xl \( {isUser ? 'rounded-br-none' : 'rounded-bl-none'}"> \){msg}</div>`;
+      chat.appendChild(bubble);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function sendInterview() {
+      const input = document.getElementById('interview-input');
+      const text = input.value.trim();
+      if (!text) return;
+      addChat(text, true);
+      input.value = '';
+      setTimeout(() => {
+        const responses = ["Per NEC 210.19(A)...", "Article 250.122 requires...", "That is correct, Trooper.", "Incorrect. Review Table 310.16."];
+        addChat(responses[Math.floor(Math.random()*responses.length)], false);
+      }, 800);
+    }
+
+    function copyPrompt(el) {
+      const text = el.querySelector('p:last-child').innerText;
+      navigator.clipboard.writeText(text);
+      const orig = el.innerHTML;
+      el.innerHTML = `<span class="text-emerald-400">✓ COPIED</span>`;
+      setTimeout(() => el.innerHTML = orig, 1500);
+    }
+
+    let tasks = JSON.parse(localStorage.getItem('imperialTasks')) || [];
+    function renderTasks() {
+      const ul = document.getElementById('todo-list');
+      ul.innerHTML = '';
+      tasks.forEach((t, i) => {
+        const li = document.createElement('li');
+        li.className = `flex items-center gap-3 bg-zinc-800 px-6 py-4 rounded-2xl ${t.done ? 'line-through opacity-60' : ''}`;
+        li.innerHTML = `<input type="checkbox" \( {t.done ? 'checked' : ''} onchange="toggleTask( \){i})" class="w-5 h-5 accent-red-600"><span class="flex-1">\( {t.text}</span><button onclick="deleteTask( \){i})" class="text-red-600 hover:text-red-400"><i class="fa-solid fa-trash"></i></button>`;
+        ul.appendChild(li);
+      });
+    }
+    function addTask() {
+      const inp = document.getElementById('todo-input');
+      if (!inp.value.trim()) return;
+      tasks.push({text: inp.value.trim(), done: false});
+      localStorage.setItem('imperialTasks', JSON.stringify(tasks));
+      inp.value = '';
+      renderTasks();
+    }
+    function toggleTask(i) { tasks[i].done = !tasks[i].done; localStorage.setItem('imperialTasks', JSON.stringify(tasks)); renderTasks(); }
+    function deleteTask(i) { tasks.splice(i, 1); localStorage.setItem('imperialTasks', JSON.stringify(tasks)); renderTasks(); }
+
+    window.onload = () => {
+      switchTab(0);
+      loadQuiz();
+      renderTasks();
+      setTimeout(() => addChat("Welcome, Trooper. Begin your NEC interview simulation.", false), 800);
+    };
+  </script>
+</body>
+</html>
